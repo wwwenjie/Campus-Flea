@@ -1,31 +1,36 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <keep-alive>
+      <transition name="van-slide-left">
+        <router-view />
+      </transition>
+    </keep-alive>
+
+    <van-tabbar route>
+      <van-tabbar-item
+        replace
+        to="/browse"
+        icon="browsing-history-o"
+      >
+        首页
+      </van-tabbar-item>
+      <van-tabbar-item
+        replace
+        to="/sale"
+        icon="after-sale"
+      >
+        出售
+      </van-tabbar-item>
+      <van-tabbar-item
+        replace
+        to="/user"
+        icon="user-o"
+      >
+        我的
+      </van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>

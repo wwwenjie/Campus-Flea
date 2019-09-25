@@ -23,6 +23,7 @@
         >
           <van-grid :gutter="10" :column-num="2" :border="false" class="grid">
             <van-grid-item
+              @click="detail(id)"
               v-for="value in data"
               :key="value.id">
               <card :url="value.url" :name="value.name" :price="value.price"></card>
@@ -35,6 +36,7 @@
       <van-tab title="服装" name="d">内容 3</van-tab>
       <van-tab title="服装" name="e">内容 3</van-tab>
     </van-tabs>
+    <tabs></tabs>
   </div>
 </template>
 
@@ -42,7 +44,8 @@
 export default {
   name: 'browse',
   components: {
-    card: () => import('@/components/browse/Card.vue')
+    card: () => import('@/components/browse/Card.vue'),
+    tabs: () => import('@/components/Tabs.vue')
   },
   data () {
     return {
@@ -161,6 +164,9 @@ export default {
       this.loading = false
       // if r = null
       this.finished = true
+    },
+    detail (id = 1) {
+      this.$router.push({ name: 'detail', params: { id } })
     }
   },
   mount: {
@@ -171,11 +177,12 @@ export default {
 </script>
 
 <style scoped>
-img {
-  width: 100%;
-  height: 240px;
-}
-.grid{
-  margin-bottom: 100px;
-}
+  img {
+    width: 100%;
+    height: 240px;
+  }
+
+  .grid {
+    margin-bottom: 100px;
+  }
 </style>

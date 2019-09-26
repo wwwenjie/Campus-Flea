@@ -35,11 +35,11 @@
     </van-cell-group>
 
     <van-goods-action>
-      <van-goods-action-icon icon="chat-o" @click="sorry">
-        客服
-      </van-goods-action-icon>
       <van-goods-action-icon icon="cart-o" @click="onClickCart">
         购物车
+      </van-goods-action-icon>
+      <van-goods-action-icon icon="star-o" @click="onClickFavorite">
+        收藏
       </van-goods-action-icon>
       <van-goods-action-button type="warning" @click="sorry">
         加入购物车
@@ -52,6 +52,11 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import { Toast } from 'vant'
+
+Vue.use(Toast)
+
 export default {
   name: 'Detail',
   data () {
@@ -73,7 +78,10 @@ export default {
       return '¥' + (this.goods.price / 100).toFixed(2)
     },
     onClickCart () {
-      this.$router.push('cart')
+      this.$router.push({ name: 'cart' })
+    },
+    onClickFavorite () {
+      Toast.success('收藏成功')
     },
     sorry () {
       Toast('暂无后续逻辑~')
@@ -132,7 +140,7 @@ export default {
       color: white;
       background-color: #4D4D4D;
       border: 1px solid #4D4D4D;
-      border-radius:50%;
+      border-radius: 50%;
       opacity: .7;
     }
   }

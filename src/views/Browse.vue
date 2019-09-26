@@ -42,7 +42,7 @@
 
 <script>
 export default {
-  name: 'browse',
+  name: 'Browse',
   components: {
     card: () => import('@/components/browse/Card.vue'),
     tabs: () => import('@/components/Tabs.vue')

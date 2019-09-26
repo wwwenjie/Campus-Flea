@@ -65,12 +65,16 @@
 
       <van-button @click="onConfirm" type="info" size="large">确认发布</van-button>
     </van-cell-group>
+    <tabs></tabs>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Sale',
+  components: {
+    tabs: () => import('@/components/Tabs.vue')
+  },
   data () {
     return {
       title: '',

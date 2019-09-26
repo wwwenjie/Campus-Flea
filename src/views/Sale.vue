@@ -107,6 +107,11 @@ export default {
     onConfirm () {
       console.log()
     }
+  },
+  mounted () {
+    if (!this.$store.state.is_login) {
+      this.$router.push('account')
+    }
   }
 }
 </script>

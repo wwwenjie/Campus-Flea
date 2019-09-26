@@ -29,6 +29,11 @@ export default new Router({
       path: '/browse/detail',
       name: 'detail',
       component: () => import('@/views/Browse/Detail.vue')
+    },
+    {
+      path: '/account',
+      name: 'account',
+      component: () => import('@/views/Account.vue')
     }
   ]
 })

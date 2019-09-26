@@ -5,11 +5,8 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    {
-      path: '/',
-      name: 'index',
-      component: () => import('@/views/Browse.vue')
-    },
+    { path: '/index', redirect: '/browse' },
+    { path: '/', redirect: '/browse' },
     {
       path: '/browse',
       name: 'browse',
@@ -34,6 +31,11 @@ export default new Router({
       path: '/account',
       name: 'account',
       component: () => import('@/views/Account.vue')
+    },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: () => import('@/views/Cart.vue')
     }
   ]
 })

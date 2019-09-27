@@ -44,8 +44,7 @@
 
 <script>
 import Vue from 'vue'
-import { Toast } from 'vant'
-import { SwipeCell } from 'vant'
+import { Toast, SwipeCell } from 'vant'
 
 Vue.use(SwipeCell)
 Vue.use(Toast)

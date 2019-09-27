@@ -1,5 +1,5 @@
 <template>
-  <van-tabbar route>
+  <van-tabbar route active-color="#ee0a24">
     <van-tabbar-item
       replace
       to="/browse"

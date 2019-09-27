@@ -13,6 +13,11 @@ export default new Router({
       component: () => import('@/views/Browse.vue')
     },
     {
+      path: '/browse/detail',
+      name: 'detail',
+      component: () => import('@/views/Browse/Detail.vue')
+    },
+    {
       path: '/sale',
       name: 'sale',
       component: () => import('@/views/Sale.vue')
@@ -23,9 +28,9 @@ export default new Router({
       component: () => import('@/views/User.vue')
     },
     {
-      path: '/browse/detail',
-      name: 'detail',
-      component: () => import('@/views/Browse/Detail.vue')
+      path: '/user/address',
+      name: 'address',
+      component: () => import('@/views/User/Address.vue')
     },
     {
       path: '/account',

@@ -11,7 +11,7 @@
       />
 
       <van-field
-        v-model="detail"
+        v-model="desc"
         :border="false"
         :autosize="{ maxHeight: 200, minHeight: 150 }"
         placeholder="描述宝贝的转手原因，入手渠道和使用感受"
@@ -78,7 +78,7 @@ export default {
   data () {
     return {
       title: '',
-      detail: '',
+      desc: '',
       fileList: [
         { url: 'https://img.yzcdn.cn/vant/cat.jpeg' },
         // Uploader 根据文件后缀来判断是否为图片文件

@@ -60,10 +60,10 @@
       </van-button>
 
       <transition name="van-fade">
-        <div v-if="status==='login'">
+        <p v-if="status==='login'">
           <span @click="setStatus('forget')" class="account-forget">忘记密码?</span>
           <span @click="setStatus('register')" class="account-register">立即注册</span>
-        </div>
+        </p>
       </transition>
     </van-col>
   </van-row>

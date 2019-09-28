@@ -22,7 +22,7 @@
           >
           </van-card>
           <template slot="right">
-            <van-button @click="onClickRemove(item.id)" square type="danger" text="删除" class="removeButton"/>
+            <van-button @click="onClickRemove(item.id)" square type="danger" text="删除" class="cart-remove-button"/>
           </template>
         </van-swipe-cell>
       </van-checkbox>
@@ -33,8 +33,9 @@
       :disabled="!checkedGoods.length"
       :button-text="submitBarText"
       @submit="onSubmit"
+      class="cart-submit-bar"
     >
-      <van-checkbox v-model="checkedAll" @change="changeAllChecked()">全选</van-checkbox>
+      <van-checkbox v-model="checkedAll" @change="changeAllChecked()" class="cart-select-all">全选</van-checkbox>
     </van-submit-bar>
   </div>
 </template>
@@ -49,7 +50,7 @@ export default {
   data () {
     return {
       checkedAll: false,
-      checkedGoods: ['1', '2', '3'],
+      checkedGoods: [],
       loading: false,
       goods: [{
         id: '1',
@@ -89,14 +90,13 @@ export default {
       return (price / 100).toFixed(2)
     },
     onSubmit () {
-      // Toast('点击结算')
       this.loading = true
     },
     onClickLeft () {
       this.$router.back()
     },
     onClickRemove () {
-      // Toast('REmove')
+      this.goods.pop()
     },
     changeAllChecked () {
       if (this.checkedAll) {
@@ -122,6 +122,20 @@ export default {
 </script>
 
 <style lang="less">
+  .cart {
+    &-remove-button {
+      height: 100%;
+    }
+
+    &-select-all {
+      margin-left: 15px;
+    }
+
+    &-submit-bar {
+      border-top: #f2f3f5 solid 1px;
+    }
+  }
+
   .card-goods {
     padding: 10px 0;
     background-color: #fff;

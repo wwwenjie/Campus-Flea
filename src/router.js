@@ -28,6 +28,16 @@ export default new Router({
       component: () => import('@/views/User.vue')
     },
     {
+      path: '/user/order',
+      name: 'order',
+      component: () => import('@/views/User/Order.vue')
+    },
+    {
+      path: '/user/order/detail',
+      name: 'orderDetail',
+      component: () => import('@/views/User/OrderDetail.vue')
+    },
+    {
       path: '/user/address',
       name: 'address',
       component: () => import('@/views/User/Address.vue')

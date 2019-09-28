@@ -20,10 +20,6 @@
             :price="formatPrice(item.price)"
             :thumb="item.thumb"
           >
-            <div slot="footer">
-              <van-button @click="onClickAdd" size="mini">+</van-button>
-              <van-button @click="onClickAdd" size="mini">-</van-button>
-            </div>
           </van-card>
           <template slot="right">
             <van-button @click="onClickRemove(item.id)" square type="danger" text="删除" class="removeButton"/>
@@ -32,6 +28,7 @@
       </van-checkbox>
     </van-checkbox-group>
     <van-submit-bar
+      :loading="loading"
       :price="totalPrice"
       :disabled="!checkedGoods.length"
       :button-text="submitBarText"
@@ -44,16 +41,16 @@
 
 <script>
 import Vue from 'vue'
-import { Toast, SwipeCell } from 'vant'
+import { SwipeCell } from 'vant'
 
 Vue.use(SwipeCell)
-Vue.use(Toast)
 export default {
   name: 'Cart',
   data () {
     return {
       checkedAll: false,
       checkedGoods: ['1', '2', '3'],
+      loading: false,
       goods: [{
         id: '1',
         title: '进口香蕉',
@@ -92,16 +89,14 @@ export default {
       return (price / 100).toFixed(2)
     },
     onSubmit () {
-      Toast('点击结算')
+      // Toast('点击结算')
+      this.loading = true
     },
     onClickLeft () {
       this.$router.back()
     },
-    onClickAdd () {
-      Toast('AA')
-    },
     onClickRemove () {
-      Toast('REmove')
+      // Toast('REmove')
     },
     changeAllChecked () {
       if (this.checkedAll) {

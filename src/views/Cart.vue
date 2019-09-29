@@ -3,7 +3,7 @@
     <van-nav-bar
       left-arrow
       @click-left="onClickLeft"
-      title="购物车"
+      :title="nav"
     />
     <van-checkbox-group class="card-goods" v-model="checkedGoods">
       <van-checkbox
@@ -49,6 +49,8 @@ export default {
   name: 'Cart',
   data () {
     return {
+      id: '',
+      nav: '',
       checkedAll: false,
       checkedGoods: [],
       loading: false,
@@ -116,6 +118,11 @@ export default {
       } else {
         this.checkedAll = false
       }
+    }
+  },
+  mounted () {
+    if (this.$route.params.id) {
+      this.nav = '创建订单'
     }
   }
 }

@@ -5,18 +5,20 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    uid: 0,
-    is_login: false
+    is_login: false,
+    uid: null,
+    good_id: null
   },
   mutations: {
-    setUid (state, id) {
+    SET_UID (state, id) {
       state.uid = id
     },
-    changeLoginStatus (state) {
+    SET_LOGIN (state) {
       state.is_login = !state.is_login
+    },
+    SET_GOOD_ID (state, id) {
+      state.good_id = id
     }
   },
-  actions: {
-
-  }
+  actions: {}
 })

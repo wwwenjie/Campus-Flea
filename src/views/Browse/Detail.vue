@@ -57,11 +57,13 @@
 <script>
 import Vue from 'vue'
 import { Toast } from 'vant'
+import store from '@/mixins.js'
 
 Vue.use(Toast)
 
 export default {
   name: 'Detail',
+  mixins: [store],
   data () {
     return {
       goods: {
@@ -102,7 +104,7 @@ export default {
     }
   },
   mounted () {
-    console.log(this.$route.params.id)
+    console.log(this.uid)
   }
 }
 </script>

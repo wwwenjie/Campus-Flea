@@ -50,8 +50,11 @@
 </template>
 
 <script>
+import store from '@/mixins.js'
+
 export default {
   name: 'Browse',
+  mixins: [store],
   components: {
     card: () => import('@/components/browse/Card.vue'),
     tabs: () => import('@/components/Tabs.vue')
@@ -131,7 +134,8 @@ export default {
       this.finished = true
     },
     goToDetail (id = 1) {
-      this.$router.push({ name: 'detail', params: { id: id.toString() } })
+      this.setUid(id)
+      this.$router.push({ name: 'detail' })
     },
     tabsChange (name, title) {
       // refresh data

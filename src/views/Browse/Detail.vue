@@ -1,7 +1,7 @@
 <template>
   <div class="goods">
     <div>
-      <van-button @click="back" icon="arrow-left" class="goods-button"/>
+      <van-button @click="routerBack" icon="arrow-left" class="goods-button"/>
     </div>
     <van-swipe class="goods-swipe" :autoplay="3000">
       <van-swipe-item v-for="thumb in goods.thumb" :key="thumb">
@@ -92,19 +92,12 @@ export default {
       Toast.success('已加入购物车')
     },
     buy () {
-      this.$router.push({
-        name: 'cart',
-        params: {
-          id: this.id
-        }
-      })
-    },
-    back () {
-      this.$router.go(-1)
+      this.$router.push({ name: 'cart', params: { id: this.goodId.toString() } })
     }
   },
   mounted () {
-    console.log(this.uid)
+    console.log(this.goodId)
+    // get detail by goodId
   }
 }
 </script>

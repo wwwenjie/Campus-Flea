@@ -2,7 +2,7 @@
   <div>
     <van-nav-bar
       left-arrow
-      @click-left="onClickLeft"
+      @click-left="routerBack"
       :title="nav"
     />
     <van-checkbox-group class="card-goods" v-model="checkedGoods">
@@ -43,13 +43,14 @@
 <script>
 import Vue from 'vue'
 import { SwipeCell } from 'vant'
+import store from '@/mixins.js'
 
 Vue.use(SwipeCell)
 export default {
   name: 'Cart',
+  mixins: [store],
   data () {
     return {
-      id: '',
       nav: '',
       checkedAll: false,
       checkedGoods: [],
@@ -94,9 +95,6 @@ export default {
     onSubmit () {
       this.loading = true
     },
-    onClickLeft () {
-      this.$router.back()
-    },
     onClickRemove () {
       this.goods.pop()
     },
@@ -123,6 +121,10 @@ export default {
   mounted () {
     if (this.$route.params.id) {
       this.nav = '创建订单'
+      // get goods by goodId
+    } else {
+      this.nav = '购物车'
+      // get goods by uid
     }
   }
 }

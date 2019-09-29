@@ -134,7 +134,7 @@ export default {
       this.finished = true
     },
     goToDetail (id = 1) {
-      this.setUid(id)
+      this.setGoodId(id)
       this.$router.push({ name: 'detail' })
     },
     tabsChange (name, title) {

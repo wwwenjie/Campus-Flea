@@ -17,6 +17,9 @@ export default {
       setLogin: 'SET_LOGIN',
       setUid: 'SET_UID',
       setGoodId: 'SET_GOOD_ID'
-    })
+    }),
+    routerBack () {
+      this.$router.back()
+    }
   }
 }

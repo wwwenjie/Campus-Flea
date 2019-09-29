@@ -70,8 +70,11 @@
 </template>
 
 <script>
+import store from '@/mixins.js'
+
 export default {
   name: 'Account',
+  mixins: [store],
   data () {
     return {
       status: 'login'
@@ -99,8 +102,8 @@ export default {
       switch (this.status) {
         case 'login':
           // handle login
-          this.$store.commit('changeLoginStatus')
-          this.$router.back()
+          this.setLogin()
+          this.routerBack()
           break
         case 'register':
           // handle register

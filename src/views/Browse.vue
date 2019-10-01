@@ -37,7 +37,7 @@
           <van-grid :gutter="10" :column-num="2" :border="false" class="grid">
             <van-grid-item
               @click="goToDetail(item.id)"
-              v-for="item in data"
+              v-for="item in goods"
               :key="item.id">
               <card :thumb="item.thumb" :title="item.title" :price="item.price"></card>
             </van-grid-item>
@@ -98,7 +98,7 @@ export default {
           name: 'help'
         }
       ],
-      data: [
+      goods: [
         {
           id: 1,
           thumb: 'https://img.yzcdn.cn/vant/apple-1.jpg',

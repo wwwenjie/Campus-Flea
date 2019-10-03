@@ -121,6 +121,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 
+# 发送短信AK
+ACCESS_KEYID = 'LTAI4FebqBNi9DQup4L3AdM3'
+ACCESS_SECRET = 'O7TsRfUn5kKxoX8U5SWDkXR9eILss3'
 
 # 发送邮件配置
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

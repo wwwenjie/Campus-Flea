@@ -30,7 +30,6 @@ def send_register_active_email(to_email, checkcodes):
     message = ''
     sender = settings.EMAIL_FROM  # 发件人
     reciver = [to_email]
-
     html_message = "<h1>尊敬的%s用户您好，欢迎注册校园跳蚤应用</h1>您的验证码为：%s" % (reciver, checkcodes)
     send_mail(subject, message, sender, reciver, html_message=html_message, fail_silently=False)
     # time.sleep()

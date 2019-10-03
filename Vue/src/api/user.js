@@ -16,9 +16,9 @@ export function Register (data) {
   })
 }
 
-export function Email (data) {
+export function Verify (data) {
   return request({
-    url: '/user/register/email',
+    url: '/user/register/verify',
     method: 'post',
     data: data
   })

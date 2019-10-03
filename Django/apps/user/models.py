@@ -15,9 +15,9 @@ class User(BaseModel):
     password = models.CharField(max_length=500, verbose_name='用户密码')
     last_login = models.DateTimeField(auto_now=True, verbose_name='最后登陆时间')
     headimg = models.ImageField(upload_to='user', verbose_name='头像')
-    tele = models.BigIntegerField(null=True, verbose_name='电话')
+    phone = models.CharField(max_length=20, verbose_name='电话')
     address = models.CharField(max_length=200, verbose_name='收货地址')
-    user_token = models.CharField(max_length=500, verbose_name='用户token', null=True)
+    user_token = models.CharField(max_length=500, verbose_name='用户token')
 
     class Meta:
         db_table = 'SchoolFleasPro_user'

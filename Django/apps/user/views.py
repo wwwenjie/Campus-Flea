@@ -27,6 +27,13 @@ from django.core.cache import cache
 # 导入Json解析库
 import json
 
+# 导入阿里云核心SDK
+from aliyunsdkcore.client import AcsClient
+from aliyunsdkcore.request import CommonRequest
+
+# 导入正则
+import re
+
 
 # Create your views here.
 class RegisterView(View):
@@ -37,16 +44,13 @@ class RegisterView(View):
         # username = request.POST.get('account')
         username = 'Sfleas_' + shuffle_str_username()[0:6]
         r = json.loads(request.body)
-        email = r['account']
+        account = r['account']
         password = r['password']
         code = r['code']
-        print(email)
-        print(password)
-        print(code)
         # 判断验证码是否正确
         # print(request.session.get('checkcode'))
         # 从redis缓存中读取缓存信息 eamil唯一
-        checkcode = cache.get(email)
+        checkcode = cache.get(account)
         print(checkcode)
         # 验证验证码是否正确
         if checkcode == code:
@@ -55,7 +59,10 @@ class RegisterView(View):
             #
             user = User()
             user.username = username
-            user.email = email
+            if judgeType(account) == 'email':
+                user.email = account
+            else:
+                user.phone = account
 
             # 密码加密
             password = Encryption({'password': password})
@@ -67,53 +74,49 @@ class RegisterView(View):
             return JsonResponse({'isSuccess': bool(False), 'msg': "验证码错误！"})
 
 
-class SendMailView(View):
+class SendVerifyView(View):
     def get(self, request):
         pass
 
     def post(self, request):
-        # 获取传过来的email
+        # 获取传过来的account
         r = json.loads(request.body)
-        email = r['email']
+        account = r['account']
+        type = judgeType(account)
+        if type == 'email':
+            email = account
+            # 判断该邮箱是否已经被注册
+            try:
+                if User.objects.get(email=email):
+                    return JsonResponse({'isSuccess': bool(False), 'msg': "该邮箱已被注册！"})
+            except User.DoesNotExist:
+                pass
 
-        # 判断该邮箱是否已经被注册
-        try:
-            if User.objects.get(email=email):
-                return JsonResponse({'isSuccess': bool(False), 'msg': "该邮箱已被注册！"})
-        except User.DoesNotExist:
-            pass
+            # 生成验证码
+            checkcodes = shuffle_str()[0:6]  # 截取0-6位
 
-        # 生成验证码
-        checkcodes = shuffle_str()[0:6]  # 截取0-6位
+            # 异步发送邮件
+            send_register_active_email.delay(email, checkcodes)
 
-        # 异步发送邮件
-        send_register_active_email.delay(email, checkcodes)
+            # 缓存到redis 设置5分钟过期
+            cache.set(email, checkcodes, 60)
+            return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
+        elif type == 'phone':
+            phone = account
 
-        # 缓存到redis 设置5分钟过期
-        cache.set(email, checkcodes, 60)
-        return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
+            # 生成验证码
+            checkcodes = shuffle_str()[0:6]  # 截取0-6位
 
-
-def shuffle_str():
-    # 验证码字库
-    checkstrs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    # 将字符串转换成列表
-    str_list = list(checkstrs)
-    # 调用random模块的shuffle函数打乱列表
-    shuffle(str_list)
-    # 将列表转字符串
-    return ''.join(str_list)
-
-
-def shuffle_str_username():
-    # 验证码字库
-    checkstrs = 'abcdefg0123456789'
-    # 将字符串转换成列表
-    str_list = list(checkstrs)
-    # 调用random模块的shuffle函数打乱列表
-    shuffle(str_list)
-    # 将列表转字符串
-    return ''.join(str_list)
+            # 发送短信
+            resp = sendSMS(phone, checkcodes)
+            if resp == 'OK':
+                # 缓存到redis 设置5分钟过期
+                cache.set(phone, checkcodes, 60)
+                return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
+            else:
+                return JsonResponse({'isSuccess': bool(False), 'msg': resp})
+        else:
+            return JsonResponse({'isSuccess': bool(False), 'msg': '账号格式有误！'})
 
 
 class LoginView(View):
@@ -145,6 +148,29 @@ class LoginView(View):
             return JsonResponse({'isSuccess': bool(False), 'msg': '账户不存在'})
 
 
+def shuffle_str():
+    # 验证码字库
+    # checkstrs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    checkstrs = '0123456789'
+    # 将字符串转换成列表
+    str_list = list(checkstrs)
+    # 调用random模块的shuffle函数打乱列表
+    shuffle(str_list)
+    # 将列表转字符串
+    return ''.join(str_list)
+
+
+def shuffle_str_username():
+    # 验证码字库
+    checkstrs = 'abcdefg0123456789'
+    # 将字符串转换成列表
+    str_list = list(checkstrs)
+    # 调用random模块的shuffle函数打乱列表
+    shuffle(str_list)
+    # 将列表转字符串
+    return ''.join(str_list)
+
+
 # 加密
 def Encryption(info):
     # 生成token
@@ -168,3 +194,38 @@ def delEncryption(val):
     result = serializer.loads(val)
     # 返回结果
     return result
+
+
+# 正则判断
+def judgeType(account):
+    phone = r"(^[1]([3-9])[0-9]{9}$)"
+    email = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    if re.match(email, account):
+        return 'email'
+    else:
+        return 'phone' if re.match(phone, account) else 'none'
+
+
+# 短信
+def sendSMS(phone, checkcodes):
+    client = AcsClient(settings.ACCESS_KEYID, settings.ACCESS_SECRET, 'cn-hangzhou')
+
+    request = CommonRequest()
+    request.set_accept_format('json')
+    request.set_domain('dysmsapi.aliyuncs.com')
+    request.set_method('POST')
+    request.set_protocol_type('https')  # https | http
+    request.set_version('2017-05-25')
+    request.set_action_name('SendSms')
+
+    request.add_query_param('RegionId', "cn-hangzhou")
+    request.add_query_param('PhoneNumbers', phone)
+    request.add_query_param('SignName', "KingNetwork")
+    request.add_query_param('TemplateCode', "SMS_174986857")
+    request.add_query_param('TemplateParam', "{\"code\":\"%s\"}" % checkcodes)
+
+    response = client.do_action(request)
+    # python2:  print(response)
+    print(str(response, encoding='utf-8'))
+    response = json.loads(response)
+    return 'OK' if response['Message'] == "OK" else response['Message']

@@ -72,7 +72,7 @@
 
 <script>
 import store from '@/mixins.js'
-import { Login, Register, Email } from '@/api/user.js'
+import { Login, Register, Verify } from '@/api/user.js'
 import Vue from 'vue'
 import { Toast } from 'vant'
 
@@ -109,8 +109,8 @@ export default {
       this.status = status
     },
     sendVerification: function () {
-      Email({
-        email: this.account
+      Verify({
+        account: this.account
       }).then(res => {
         if (res.data.isSuccess) {
           Toast.success(res.data.msg)

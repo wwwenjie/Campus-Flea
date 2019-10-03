@@ -1,6 +1,7 @@
-# 导入View抽象类post,get方法
-from random import shuffle
 
+from datetime import datetime
+from random import shuffle
+# 导入View抽象类post,get方法
 from django.views.generic import View
 
 # 导入django自带的认证方法
@@ -41,12 +42,22 @@ class RegisterView(View):
         print(code)
         # 判断验证码是否正确
         # print(request.session.get('checkcode'))
+        # 从redis缓存中读取缓存信息 eamil唯一
         checkcode = cache.get(email)
+
+        # 验证验证码是否正确
         if checkcode == code:
             # 3.业务逻辑处理
-            user = User.objects.create_user(username, email, password)
-            # 将用户设置为未激活状态
-            user.is_active = 1
+            # user = User.objects.create_user(username, email, password)
+            #
+            user = User()
+            user.username = username
+            user.email = email
+
+            # 密码加密
+            password = Encryption({'password': password})
+            user.password = password
+            # 保存
             user.save()
             return JsonResponse({'isSuccess': 'true', 'msg': "注册成功！"})
         else:
@@ -111,26 +122,49 @@ class LoginView(View):
     def post(self, request):
         email = request.POST.get('account')
         password = request.POST.get('password')
-        print(email)
-        print(password)
-        user = authenticate(email=email, password=password)
+        # 获取数据
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = ''
 
         if user:
-            # 加密文件
-            info = {'id': user.id, 'update_time': user.update_time}
-            # 加密
-            # 生成token
-            # 3600s为过期时间
-            # setting.SECRET_KEY为密文
-            serializer = Serializer(settings.SECRET_KEY)
-            # 加密是dumps 解密为loads
-            # 二进制形式
-            token = serializer.dumps(info)  # bytes
-            # 转化为utf-8形式
-            token = token.decode()
-            #         保存token
-            user.user_token = token
-            user.save()
+            # 解密
+            mysql_password = delEncryption(user.password)
+            print(mysql_password['password'])
+            if password == mysql_password['password']:
+                # 加密文件
+                info = {'id': user.id, 'datetimenow': str(datetime.now())}
+                # 加密
+                token = Encryption(info)
+                #         保存token
+                user.user_token = token
+                user.save()
             return JsonResponse({'uid': user.id, 'isSuccess': 'true', 'token': token})
         else:
-            return JsonResponse({'isSuccess': 'false', 'msg': '账号或密码错误'})
+            return JsonResponse({'isSuccess': 'false', 'msg': '账户不存在'})
+
+
+# 加密
+def Encryption(info):
+    # 生成token
+    # 3600s为过期时间
+    # setting.SECRET_KEY为密文
+    serializer = Serializer(settings.SECRET_KEY)
+    # 加密是dumps 解密为loads
+    # 二进制形式
+    token = serializer.dumps(info)  # bytes
+    # 转化为utf-8形式
+    token = token.decode()
+    # 返回加密后的内容
+    return token
+
+
+# 解密
+def delEncryption(val):
+    # 创建对象
+    serializer = Serializer(settings.SECRET_KEY)
+    # 解密
+    result = serializer.loads(val)
+    # 返回结果
+    return result

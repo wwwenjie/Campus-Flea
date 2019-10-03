@@ -1,1 +1,0 @@
-# Back-end powered by django

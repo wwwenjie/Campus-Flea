@@ -17,7 +17,7 @@ from django.http import request
 app = Celery('celery_tasks.tasks', broker='redis://127.0.0.1:6379/2')
 
 # 初始化django 因为下面需要使用django本身的配置项settings.EMAIL_FROM
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'schoolfleas.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SchoolFleasPro.settings')
 django.setup()
 
 

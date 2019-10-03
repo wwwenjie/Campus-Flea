@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from random import shuffle
 # 导入View抽象类post,get方法
@@ -25,6 +24,9 @@ from django.conf import settings
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
+# 导入Json解析库
+import json
+
 
 # Create your views here.
 class RegisterView(View):
@@ -34,17 +36,18 @@ class RegisterView(View):
     def post(self, request):
         # username = request.POST.get('account')
         username = 'Sfleas_' + shuffle_str_username()[0:6]
-        password = request.POST.get('password')
-        email = request.POST.get('account')
-        code = request.POST.get('code')
-        print(password)
+        r = json.loads(request.body)
+        email = r['account']
+        password = r['password']
+        code = r['code']
         print(email)
+        print(password)
         print(code)
         # 判断验证码是否正确
         # print(request.session.get('checkcode'))
         # 从redis缓存中读取缓存信息 eamil唯一
         checkcode = cache.get(email)
-
+        print(checkcode)
         # 验证验证码是否正确
         if checkcode == code:
             # 3.业务逻辑处理
@@ -59,9 +62,9 @@ class RegisterView(View):
             user.password = password
             # 保存
             user.save()
-            return JsonResponse({'isSuccess': 'true', 'msg': "注册成功！"})
+            return JsonResponse({'isSuccess': bool(True), 'msg': "注册成功！"})
         else:
-            return JsonResponse({'isSuccess': 'false', 'msg': "验证码错误！"})
+            return JsonResponse({'isSuccess': bool(False), 'msg': "验证码错误！"})
 
 
 class SendMailView(View):
@@ -70,17 +73,15 @@ class SendMailView(View):
 
     def post(self, request):
         # 获取传过来的email
-        email = request.POST.get('email')
+        r = json.loads(request.body)
+        email = r['email']
 
         # 判断该邮箱是否已经被注册
         try:
-            recheck = User.objects.get(email=email)
+            if User.objects.get(email=email):
+                return JsonResponse({'isSuccess': bool(False), 'msg': "该邮箱已被注册！"})
         except User.DoesNotExist:
-            recheck = None
-
-        # 假如邮箱已经存在
-        if recheck:
-            return JsonResponse({'isSuccess': 'false', 'msg': "该邮箱已被注册！"})
+            pass
 
         # 生成验证码
         checkcodes = shuffle_str()[0:6]  # 截取0-6位
@@ -90,7 +91,7 @@ class SendMailView(View):
 
         # 缓存到redis 设置5分钟过期
         cache.set(email, checkcodes, 60)
-        return JsonResponse({'isSuccess': "true", 'msg': '发送成功！'})
+        return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
 
 
 def shuffle_str():
@@ -120,15 +121,12 @@ class LoginView(View):
         pass
 
     def post(self, request):
-        email = request.POST.get('account')
-        password = request.POST.get('password')
+        r = json.loads(request.body)
+        email = r['account']
+        password = r['password']
         # 获取数据
         try:
             user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            user = ''
-
-        if user:
             # 解密
             mysql_password = delEncryption(user.password)
             print(mysql_password['password'])
@@ -137,12 +135,14 @@ class LoginView(View):
                 info = {'id': user.id, 'datetimenow': str(datetime.now())}
                 # 加密
                 token = Encryption(info)
-                #         保存token
+                # 保存token
                 user.user_token = token
                 user.save()
-            return JsonResponse({'uid': user.id, 'isSuccess': 'true', 'token': token})
-        else:
-            return JsonResponse({'isSuccess': 'false', 'msg': '账户不存在'})
+                return JsonResponse({'uid': user.id, 'isSuccess': bool(True), 'token': token})
+            else:
+                return JsonResponse({'isSuccess': bool(False), 'msg': '账号或密码错误'})
+        except User.DoesNotExist:
+            return JsonResponse({'isSuccess': bool(False), 'msg': '账户不存在'})
 
 
 # 加密

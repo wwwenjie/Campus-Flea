@@ -9,7 +9,7 @@
       <span class="account-span">快捷登录注册</span>
 
       <van-field
-        v-model="username"
+        v-model="account"
         clearable
         size="large"
         placeholder="邮箱/手机号"
@@ -41,7 +41,7 @@
       <transition name="van-slide-up">
         <van-field
           v-if="status!=='login'"
-          v-model="password"
+          v-model="rePassword"
           type="password"
           size="large"
           placeholder="确认密码"
@@ -71,13 +71,21 @@
 
 <script>
 import store from '@/mixins.js'
+import { Login } from '@/api/user.js'
+import Vue from 'vue'
+import { Toast } from 'vant'
+
+Vue.use(Toast)
 
 export default {
   name: 'Account',
   mixins: [store],
   data () {
     return {
-      status: 'login'
+      status: 'login',
+      account: null,
+      password: null,
+      rePassword: null
     }
   },
   computed: {
@@ -102,8 +110,21 @@ export default {
       switch (this.status) {
         case 'login':
           // handle login
-          this.setLogin()
-          this.routerBack()
+          Login({
+            account: '123',
+            password: '153'
+          }).then(res => {
+            console.log(res.data.isSuccess)
+            if (res.data.isSuccess) {
+              Toast.success('登陆成功')
+            } else {
+              Toast.fail('登陆失败' + res.data.msg)
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+          // this.setLogin()
+          // this.routerBack()
           break
         case 'register':
           // handle register

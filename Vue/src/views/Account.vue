@@ -15,13 +15,14 @@
         placeholder="邮箱/手机号"
         class="account-input"
       >
-        <van-button v-if="status!=='login'" slot="button" size="small" type="primary">发送验证码</van-button>
+        <van-button v-if="status!=='login'" @click="sendVerification" slot="button" size="small" type="primary">发送验证码
+        </van-button>
       </van-field>
 
       <transition name="van-slide-up">
         <van-field
           v-if="status!=='login'"
-          v-model="sms"
+          v-model="code"
           center
           clearable
           placeholder="请输入短信验证码"
@@ -71,7 +72,7 @@
 
 <script>
 import store from '@/mixins.js'
-import { Login } from '@/api/user.js'
+import { Login, Register, Email } from '@/api/user.js'
 import Vue from 'vue'
 import { Toast } from 'vant'
 
@@ -84,6 +85,7 @@ export default {
     return {
       status: 'login',
       account: null,
+      code: null,
       password: null,
       rePassword: null
     }
@@ -106,19 +108,35 @@ export default {
     setStatus: function (status) {
       this.status = status
     },
+    sendVerification: function () {
+      Email({
+        email: this.account
+      }).then(res => {
+        if (res.data.isSuccess) {
+          Toast.success(res.data.msg)
+        } else {
+          Toast.fail(res.data.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     handleButtonClick: function () {
       switch (this.status) {
         case 'login':
           // handle login
           Login({
-            account: '123',
-            password: '153'
+            account: this.account,
+            password: this.password
           }).then(res => {
-            console.log(res.data.isSuccess)
             if (res.data.isSuccess) {
               Toast.success('登陆成功')
+              this.setUid(res.data.uid)
+              this.setToken(res.data.token)
+              this.setLogin()
+              this.routerBack()
             } else {
-              Toast.fail('登陆失败' + res.data.msg)
+              Toast.fail(res.data.msg)
             }
           }).catch(err => {
             console.log(err)
@@ -128,7 +146,25 @@ export default {
           break
         case 'register':
           // handle register
-          this.status = 'login'
+          if (this.password !== this.rePassword) {
+            Toast.fail('两次输入的密码不一致')
+            break
+          }
+          Register({
+            account: this.account,
+            password: this.password,
+            code: this.code
+          }).then(res => {
+            console.log(res.data.isSuccess)
+            if (res.data.isSuccess) {
+              Toast.success(res.data.msg)
+              this.status = 'login'
+            } else {
+              Toast.fail(res.data.msg)
+            }
+          }).catch(err => {
+            console.log(err)
+          })
           break
         case 'forget':
           // handle forget

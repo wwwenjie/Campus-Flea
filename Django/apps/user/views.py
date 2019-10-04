@@ -3,36 +3,32 @@ from random import shuffle
 # 导入View抽象类post,get方法
 from django.views.generic import View
 
-# 导入django自带的认证方法
-from django.contrib.auth import authenticate
 from django.http import JsonResponse
 
 # 导入数据库模型
 from apps.user.models import User  # 这李绝对路径会报错，我也不知道为啥，百度的
 
+# 异步发邮件
 from celery_tasks.tasks import send_register_active_email
-# 导入setting中的密文SECRET_KEY
-from django.conf import settings
 
-# 导入加密 需要 pip install itsdangerous
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-# 解密时间过期异常类
-from itsdangerous import SignatureExpired
 # 导入setting中的密文SECRET_KEY
 from django.conf import settings
 
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
-# 导入Json解析库
+# Json解析库
 import json
 
-# 导入阿里云核心SDK
+# 阿里云核心SDK
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
 
-# 导入正则
+# 正则
 import re
+
+# hash加密
+import hashlib
 
 
 # Create your views here.
@@ -41,32 +37,28 @@ class RegisterView(View):
         pass
 
     def post(self, request):
-        # username = request.POST.get('account')
-        username = 'Sfleas_' + shuffle_str_username()[0:6]
         r = json.loads(request.body)
         account = r['account']
         password = r['password']
         code = r['code']
-        # 判断验证码是否正确
-        # print(request.session.get('checkcode'))
-        # 从redis缓存中读取缓存信息 eamil唯一
-        checkcode = cache.get(account)
-        print(checkcode)
+        if judge_type(account) is None:
+            return JsonResponse({'isSuccess': bool(False), 'msg': "账号格式有误！"})
+        # 从redis缓存中读取缓存信息 account唯一
+        check_code = cache.get(account)
+        print(check_code)
         # 验证验证码是否正确
-        if checkcode == code:
-            # 3.业务逻辑处理
-            # user = User.objects.create_user(username, email, password)
-            #
+        if check_code == code:
+            # 新加用户
             user = User()
-            user.username = username
-            if judgeType(account) == 'email':
-                user.email = account
-            else:
+            user.username = 'Sfleas_' + shuffle_str(True)[0:6]
+            # 判断账号类型
+            if judge_type(account) == 'phone':
                 user.phone = account
-
+            else:
+                user.email = account
             # 密码加密
-            password = Encryption({'password': password})
-            user.password = password
+            user.password = encrypt(password)
+            print(user.password)
             # 保存
             user.save()
             return JsonResponse({'isSuccess': bool(True), 'msg': "注册成功！"})
@@ -82,8 +74,10 @@ class SendVerifyView(View):
         # 获取传过来的account
         r = json.loads(request.body)
         account = r['account']
-        type = judgeType(account)
-        if type == 'email':
+        type = judge_type(account)
+        if type is None:
+            return JsonResponse({'isSuccess': bool(False), 'msg': "账号格式有误！"})
+        elif type == 'email':
             email = account
             # 判断该邮箱是否已经被注册
             try:
@@ -93,30 +87,33 @@ class SendVerifyView(View):
                 pass
 
             # 生成验证码
-            checkcodes = shuffle_str()[0:6]  # 截取0-6位
-
+            check_code = shuffle_str()[0:6]  # 截取0-6位
             # 异步发送邮件
-            send_register_active_email.delay(email, checkcodes)
+            send_register_active_email.delay(email, check_code)
 
             # 缓存到redis 设置5分钟过期
-            cache.set(email, checkcodes, 60)
+            cache.set(email, check_code, 300)
             return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
-        elif type == 'phone':
+        else:
             phone = account
+            # 判断手机该是否已经被注册
+            try:
+                if User.objects.get(phone=phone):
+                    return JsonResponse({'isSuccess': bool(False), 'msg': "该手机号已被注册！"})
+            except User.DoesNotExist:
+                pass
 
             # 生成验证码
-            checkcodes = shuffle_str()[0:6]  # 截取0-6位
+            check_code = shuffle_str()[0:6]  # 截取0-6位
 
             # 发送短信
-            resp = sendSMS(phone, checkcodes)
+            resp = send_sms(phone, check_code)
             if resp == 'OK':
                 # 缓存到redis 设置5分钟过期
-                cache.set(phone, checkcodes, 60)
+                cache.set(phone, check_code, 300)
                 return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
             else:
                 return JsonResponse({'isSuccess': bool(False), 'msg': resp})
-        else:
-            return JsonResponse({'isSuccess': bool(False), 'msg': '账号格式有误！'})
 
 
 class LoginView(View):
@@ -125,19 +122,19 @@ class LoginView(View):
 
     def post(self, request):
         r = json.loads(request.body)
-        email = r['account']
+        account = r['account']
         password = r['password']
         # 获取数据
         try:
-            user = User.objects.get(email=email)
-            # 解密
-            mysql_password = delEncryption(user.password)
-            print(mysql_password['password'])
-            if password == mysql_password['password']:
-                # 加密文件
-                info = {'id': user.id, 'datetimenow': str(datetime.now())}
-                # 加密
-                token = Encryption(info)
+            if judge_type(account) == 'email':
+                user = User.objects.get(email=account)
+            else:
+                user = User.objects.get(phone=account)
+            # 验证密码
+            print(encrypt(password))
+            if encrypt(password) == user.password:
+                # 重写token
+                token = encrypt(user.id, str(datetime.now()))
                 # 保存token
                 user.user_token = token
                 user.save()
@@ -148,23 +145,32 @@ class LoginView(View):
             return JsonResponse({'isSuccess': bool(False), 'msg': '账户不存在'})
 
 
-def shuffle_str():
-    # 验证码字库
-    # checkstrs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    checkstrs = '0123456789'
-    # 将字符串转换成列表
-    str_list = list(checkstrs)
-    # 调用random模块的shuffle函数打乱列表
-    shuffle(str_list)
-    # 将列表转字符串
-    return ''.join(str_list)
+class AuthView(View):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        r = json.loads(request.body)
+        uid = r['uid']
+        token = r['token']
+        try:
+            user = User.objects.get(id=uid)
+            if user.user_token == token:
+                return JsonResponse({'isSuccess': bool(True)})
+            else:
+                return JsonResponse({'isSuccess': bool(False)})
+        except User.DoesNotExist:
+            return JsonResponse({'isSuccess': bool(False)})
 
 
-def shuffle_str_username():
+def shuffle_str(alphabet=None):
     # 验证码字库
-    checkstrs = 'abcdefg0123456789'
+    if alphabet:
+        check_str = 'abcdefg0123456789'
+    else:
+        check_str = '0123456789'
     # 将字符串转换成列表
-    str_list = list(checkstrs)
+    str_list = list(check_str)
     # 调用random模块的shuffle函数打乱列表
     shuffle(str_list)
     # 将列表转字符串
@@ -172,42 +178,31 @@ def shuffle_str_username():
 
 
 # 加密
-def Encryption(info):
-    # 生成token
-    # 3600s为过期时间
-    # setting.SECRET_KEY为密文
-    serializer = Serializer(settings.SECRET_KEY)
-    # 加密是dumps 解密为loads
-    # 二进制形式
-    token = serializer.dumps(info)  # bytes
-    # 转化为utf-8形式
-    token = token.decode()
-    # 返回加密后的内容
-    return token
-
-
-# 解密
-def delEncryption(val):
-    # 创建对象
-    serializer = Serializer(settings.SECRET_KEY)
-    # 解密
-    result = serializer.loads(val)
-    # 返回结果
-    return result
+def encrypt(content, confusion=None):
+    # 创建一个hash对象
+    h = hashlib.sha256()
+    # 提升密码复杂度，防止直接解密
+    h.update(settings.SECRET_KEY.encode('utf-8'))
+    # 填充要加密的数据
+    h.update(str(content).encode('utf-8'))
+    if confusion:
+        h.update(str(confusion).encode('utf-8'))
+    # 获取加密结果
+    return h.hexdigest()
 
 
 # 正则判断
-def judgeType(account):
+def judge_type(account):
     phone = r"(^[1]([3-9])[0-9]{9}$)"
     email = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    if re.match(email, account):
-        return 'email'
+    if re.match(phone, account):
+        return 'phone'
     else:
-        return 'phone' if re.match(phone, account) else 'none'
+        return 'email' if re.match(email, account) else None
 
 
 # 短信
-def sendSMS(phone, checkcodes):
+def send_sms(phone, checkcode):
     client = AcsClient(settings.ACCESS_KEYID, settings.ACCESS_SECRET, 'cn-hangzhou')
 
     request = CommonRequest()
@@ -222,7 +217,7 @@ def sendSMS(phone, checkcodes):
     request.add_query_param('PhoneNumbers', phone)
     request.add_query_param('SignName', "KingNetwork")
     request.add_query_param('TemplateCode', "SMS_174986857")
-    request.add_query_param('TemplateParam', "{\"code\":\"%s\"}" % checkcodes)
+    request.add_query_param('TemplateParam', "{\"code\":\"%s\"}" % checkcode)
 
     response = client.do_action(request)
     # python2:  print(response)

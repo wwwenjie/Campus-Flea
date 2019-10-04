@@ -34,10 +34,3 @@ def send_register_active_email(to_email, checkcodes):
     send_mail(subject, message, sender, reciver, html_message=html_message, fail_silently=False)
     # time.sleep()
     print(checkcodes)
-
-# 验证码2 纯数字
-# def shuffle_str2():
-#     strcode = ''
-#     for i in range(6):
-#         strcode = strcode.join(str(random.randint(0, 9)))
-#     return strcode

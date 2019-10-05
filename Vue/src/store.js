@@ -11,8 +11,8 @@ export default new Vuex.Store({
     good_id: null
   },
   mutations: {
-    SET_LOGIN (state) {
-      state.is_login = !state.is_login
+    SET_LOGIN (state, isLogin) {
+      state.is_login = isLogin
     },
     SET_UID (state, id) {
       state.uid = id

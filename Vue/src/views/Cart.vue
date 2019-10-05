@@ -43,12 +43,12 @@
 <script>
 import Vue from 'vue'
 import { SwipeCell } from 'vant'
-import store from '@/mixins.js'
+import mixins from '@/mixins'
 
 Vue.use(SwipeCell)
 export default {
   name: 'Cart',
-  mixins: [store],
+  mixins: [mixins],
   data () {
     return {
       nav: '',

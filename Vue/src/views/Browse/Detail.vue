@@ -57,13 +57,13 @@
 <script>
 import Vue from 'vue'
 import { Toast } from 'vant'
-import store from '@/mixins.js'
+import mixins from '@/mixins'
 
 Vue.use(Toast)
 
 export default {
   name: 'Detail',
-  mixins: [store],
+  mixins: [mixins],
   data () {
     return {
       goods: {

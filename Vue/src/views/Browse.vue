@@ -50,11 +50,11 @@
 </template>
 
 <script>
-import store from '@/mixins.js'
+import mixins from '@/mixins'
 
 export default {
   name: 'Browse',
-  mixins: [store],
+  mixins: [mixins],
   components: {
     card: () => import('@/components/browse/Card.vue'),
     tabs: () => import('@/components/Tabs.vue')

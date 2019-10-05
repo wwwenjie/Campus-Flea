@@ -23,3 +23,11 @@ export function Verify (data) {
     data: data
   })
 }
+
+export function Auth (data) {
+  return request({
+    url: '/user/auth',
+    method: 'post',
+    data: data
+  })
+}

@@ -71,8 +71,8 @@
 </template>
 
 <script>
-import store from '@/mixins.js'
-import { Login, Register, Verify } from '@/api/user.js'
+import mixins from '@/mixins'
+import { Login, Register, Verify } from '@/api/user'
 import Vue from 'vue'
 import { Toast } from 'vant'
 
@@ -80,7 +80,7 @@ Vue.use(Toast)
 
 export default {
   name: 'Account',
-  mixins: [store],
+  mixins: [mixins],
   data () {
     return {
       status: 'login',
@@ -131,9 +131,11 @@ export default {
           }).then(res => {
             if (res.data.isSuccess) {
               Toast.success('登陆成功')
+              localStorage.setItem('uid', res.data.uid)
               this.setUid(res.data.uid)
+              localStorage.setItem('token', res.data.token)
               this.setToken(res.data.token)
-              this.setLogin()
+              this.setLogin({ isLogin: true })
               this.routerBack()
             } else {
               Toast.fail(res.data.msg)
@@ -141,8 +143,6 @@ export default {
           }).catch(err => {
             console.log(err)
           })
-          // this.setLogin()
-          // this.routerBack()
           break
         case 'register':
           // handle register

@@ -4,8 +4,8 @@
       <van-button @click="routerBack" icon="arrow-left" class="goods-button"/>
     </div>
     <van-swipe class="goods-swipe" :autoplay="3000">
-      <van-swipe-item v-for="thumb in goods.thumb" :key="thumb">
-        <img :src="thumb">
+      <van-swipe-item v-for="url in goods.url" :key="url">
+        <img :src="url">
       </van-swipe-item>
     </van-swipe>
 
@@ -71,7 +71,7 @@ export default {
         price: 2680,
         express: '仅面交',
         remain: 19,
-        thumb: [
+        url: [
           'https://img.yzcdn.cn/public_files/2017/10/24/e5a5a02309a41f9f5def56684808d9ae.jpeg',
           'https://img.yzcdn.cn/public_files/2017/10/24/1791ba14088f9c2be8c610d0a6cc0f93.jpeg'
         ]

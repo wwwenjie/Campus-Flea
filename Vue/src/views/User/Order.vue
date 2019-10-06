@@ -12,7 +12,7 @@
         price="2.00"
         title="商品标题"
         desc="描述信息"
-        thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+        url="https://img.yzcdn.cn/vant/t-thirt.jpg"
         class="card"
       >
         <div slot="tags">
@@ -24,7 +24,7 @@
         price="2.00"
         title="商品标题"
         desc="描述信息"
-        thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+        url="https://img.yzcdn.cn/vant/t-thirt.jpg"
         class="card"
       >
         <div slot="tags">
@@ -36,7 +36,7 @@
         price="2.00"
         title="商品标题"
         desc="描述信息"
-        thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+        url="https://img.yzcdn.cn/vant/t-thirt.jpg"
         class="card"
       >
         <div slot="tags">

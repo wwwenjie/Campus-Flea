@@ -3,7 +3,7 @@
     <van-image
       width="100%"
       lazy-load
-      :src="thumb"
+      :src="url"
       class="min-height"
     >
       <template v-slot:loading>
@@ -25,7 +25,7 @@
 export default {
   name: 'Card',
   props: {
-    thumb: {},
+    url: {},
     title: {
       require: true
     },

@@ -39,7 +39,7 @@
               @click="goToDetail(item.id)"
               v-for="item in goods"
               :key="item.id">
-              <card :thumb="item.thumb" :title="item.title" :price="item.price"></card>
+              <card :url="item.url" :title="item.title" :price="item.price"></card>
             </van-grid-item>
           </van-grid>
         </van-list>
@@ -96,18 +96,22 @@ export default {
         {
           title: '求助',
           name: 'help'
+        },
+        {
+          title: '其他',
+          name: 'other'
         }
       ],
       goods: [
         {
           id: 1,
-          thumb: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
           title: '免押金出租索尼E口24 1.4 GM大师定焦镜头全画幅 免押金出',
           price: 1200
         },
         {
           id: 2,
-          thumb: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
           title: 'sss',
           price: 50
         }
@@ -133,7 +137,7 @@ export default {
       // if r = null
       this.finished = true
     },
-    goToDetail (id = 1) {
+    goToDetail (id) {
       this.setGoodId(id)
       this.$router.push({ name: 'detail' })
     },

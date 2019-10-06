@@ -112,7 +112,7 @@ export default {
       Verify({
         account: this.account
       }).then(res => {
-        if (res.data.isSuccess) {
+        if (res.data.success) {
           Toast.success(res.data.msg)
         } else {
           Toast.fail(res.data.msg)
@@ -129,7 +129,7 @@ export default {
             account: this.account,
             password: this.password
           }).then(res => {
-            if (res.data.isSuccess) {
+            if (res.data.success) {
               Toast.success('登陆成功')
               localStorage.setItem('uid', res.data.uid)
               this.setUid(res.data.uid)
@@ -155,8 +155,8 @@ export default {
             password: this.password,
             code: this.code
           }).then(res => {
-            console.log(res.data.isSuccess)
-            if (res.data.isSuccess) {
+            console.log(res.data.success)
+            if (res.data.success) {
               Toast.success(res.data.msg)
               this.status = 'login'
             } else {

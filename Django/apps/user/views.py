@@ -42,7 +42,7 @@ class RegisterView(View):
         password = r['password']
         code = r['code']
         if judge_type(account) is None:
-            return JsonResponse({'isSuccess': bool(False), 'msg': "账号格式有误！"})
+            return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
         # 从redis缓存中读取缓存信息 account唯一
         check_code = cache.get(account)
         print(check_code)
@@ -61,9 +61,9 @@ class RegisterView(View):
             print(user.password)
             # 保存
             user.save()
-            return JsonResponse({'isSuccess': bool(True), 'msg': "注册成功！"})
+            return JsonResponse({'success': bool(True), 'msg': "注册成功！"})
         else:
-            return JsonResponse({'isSuccess': bool(False), 'msg': "验证码错误！"})
+            return JsonResponse({'success': bool(False), 'msg': "验证码错误！"})
 
 
 class SendVerifyView(View):
@@ -76,13 +76,13 @@ class SendVerifyView(View):
         account = r['account']
         type = judge_type(account)
         if type is None:
-            return JsonResponse({'isSuccess': bool(False), 'msg': "账号格式有误！"})
+            return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
         elif type == 'email':
             email = account
             # 判断该邮箱是否已经被注册
             try:
                 if User.objects.get(email=email):
-                    return JsonResponse({'isSuccess': bool(False), 'msg': "该邮箱已被注册！"})
+                    return JsonResponse({'success': bool(False), 'msg': "该邮箱已被注册！"})
             except User.DoesNotExist:
                 pass
 
@@ -93,13 +93,13 @@ class SendVerifyView(View):
 
             # 缓存到redis 设置5分钟过期
             cache.set(email, check_code, 300)
-            return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
+            return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
         else:
             phone = account
             # 判断手机该是否已经被注册
             try:
                 if User.objects.get(phone=phone):
-                    return JsonResponse({'isSuccess': bool(False), 'msg': "该手机号已被注册！"})
+                    return JsonResponse({'success': bool(False), 'msg': "该手机号已被注册！"})
             except User.DoesNotExist:
                 pass
 
@@ -111,9 +111,9 @@ class SendVerifyView(View):
             if resp == 'OK':
                 # 缓存到redis 设置5分钟过期
                 cache.set(phone, check_code, 300)
-                return JsonResponse({'isSuccess': bool(True), 'msg': '发送成功！'})
+                return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
             else:
-                return JsonResponse({'isSuccess': bool(False), 'msg': resp})
+                return JsonResponse({'success': bool(False), 'msg': resp})
 
 
 class LoginView(View):
@@ -138,11 +138,11 @@ class LoginView(View):
                 # 保存token
                 user.user_token = token
                 user.save()
-                return JsonResponse({'uid': user.id, 'isSuccess': bool(True), 'token': token})
+                return JsonResponse({'uid': user.id, 'success': bool(True), 'token': token})
             else:
-                return JsonResponse({'isSuccess': bool(False), 'msg': '账号或密码错误'})
+                return JsonResponse({'success': bool(False), 'msg': '账号或密码错误'})
         except User.DoesNotExist:
-            return JsonResponse({'isSuccess': bool(False), 'msg': '账户不存在'})
+            return JsonResponse({'success': bool(False), 'msg': '账户不存在'})
 
 
 class AuthView(View):
@@ -156,11 +156,11 @@ class AuthView(View):
         try:
             user = User.objects.get(id=uid)
             if user.user_token == token:
-                return JsonResponse({'isSuccess': bool(True)})
+                return JsonResponse({'success': bool(True)})
             else:
-                return JsonResponse({'isSuccess': bool(False)})
+                return JsonResponse({'success': bool(False)})
         except User.DoesNotExist:
-            return JsonResponse({'isSuccess': bool(False)})
+            return JsonResponse({'success': bool(False)})
 
 
 def shuffle_str(alphabet=None):
@@ -195,10 +195,14 @@ def encrypt(content, confusion=None):
 def judge_type(account):
     phone = r"(^[1]([3-9])[0-9]{9}$)"
     email = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    if re.match(phone, account):
-        return 'phone'
-    else:
-        return 'email' if re.match(email, account) else None
+    try:
+        if re.match(phone, account):
+            return 'phone'
+        else:
+            return 'email' if re.match(email, account) else None
+    # 前端直接传null时返回None
+    except TypeError:
+        return None
 
 
 # 短信

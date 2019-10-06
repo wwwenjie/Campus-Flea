@@ -17,7 +17,7 @@ export default {
       uid: localStorage.getItem('uid'),
       token: localStorage.getItem('token')
     }).then(res => {
-      if (res.data.isSuccess) {
+      if (res.data.success) {
         this.$store.commit('SET_LOGIN', {
           isLogin: true
         })

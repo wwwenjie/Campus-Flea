@@ -22,3 +22,11 @@ export function Upload (data) {
     data: data
   })
 }
+
+export function Detail (data) {
+  return request({
+    url: '/goods/detail',
+    method: 'post',
+    data: data
+  })
+}

@@ -26,7 +26,7 @@
       </van-swipe-item>
     </van-swipe>
     <van-tabs @change="tabsChange" sticky animated swipeable>
-      <van-tab v-for="tab in tabs" :key="tab.name" :title="tab.title" :name="tab.name">
+      <van-tab v-for="tab in tabs" :key="tab" :title="tab">
         <van-list
           v-model="loading"
           :finished="finished"
@@ -72,36 +72,7 @@ export default {
         'https://img.yzcdn.cn/vant/apple-3.jpg',
         'https://img.yzcdn.cn/vant/apple-4.jpg'
       ],
-      tabs: [
-        {
-          title: '最新',
-          name: 'newest'
-        },
-        {
-          title: '书籍',
-          name: 'book'
-        },
-        {
-          title: '生活用品',
-          name: 'daily'
-        },
-        {
-          title: '3C数码',
-          name: '3c'
-        },
-        {
-          title: '鞋服美妆',
-          name: 'dress'
-        },
-        {
-          title: '求助',
-          name: 'help'
-        },
-        {
-          title: '其他',
-          name: 'other'
-        }
-      ],
+      tabs: ['最新', '书籍', '生活用品', '3C数码', '鞋服美妆', '兼职', '求助', '其他'],
       goods: [
         {
           id: 1,
@@ -111,6 +82,24 @@ export default {
         },
         {
           id: 2,
+          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+          title: 'sss',
+          price: 50
+        },
+        {
+          id: 3,
+          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+          title: 'sss',
+          price: 50
+        },
+        {
+          id: 4,
+          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+          title: 'sss',
+          price: 50
+        },
+        {
+          id: 5,
           url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
           title: 'sss',
           price: 50

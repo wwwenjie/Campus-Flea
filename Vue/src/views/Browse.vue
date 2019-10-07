@@ -93,7 +93,6 @@ export default {
       this.searchList = []
     },
     onLoad () {
-      console.log('onloading')
       // request data
       this.loading = true
       this.finished = false
@@ -107,12 +106,9 @@ export default {
           }
           this.loading = false
           this.page++
-          console.log('request one')
         } else {
-          console.log('null data,finished:')
           this.finished = true
           this.loading = false
-          console.log(this.finished)
         }
       }).catch(err => {
         console.log(err)

@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <keep-alive>
-      <transition name="van-slide-left">
+    <transition name="van-slide-left">
+      <keep-alive>
         <router-view/>
-      </transition>
-    </keep-alive>
+      </keep-alive>
+    </transition>
   </div>
 </template>
 

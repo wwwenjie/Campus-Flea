@@ -44,83 +44,42 @@ class GoodsMainView(View):
             for item in goods_page:
                 goods.append({
                     'id': item.id,
-                    # 只获取第一张图片展示
-                    'url': item.url.split('|', 1)[0],
                     'title': item.title,
-                    'price': item.price
+                    'price': item.price,
+                    # 只获取第一张图片展示
+                    'url': item.url.split('|', 1)[0]
                 })
             return JsonResponse({'data': goods})
         except Goods.DoesNotExist:
             return JsonResponse({'data': None})
 
 
-# # 首页商品游览
-# class GoodsMainView(View):
-#     # 当前查询长度
-#     LENGTH = 0
-#     # 当前类别总数，设置为1让无论如何都执行第一次查询，简化先获取MAX_LENGTH的代码
-#     MAX_LENGTH = 1
-#     # 步长
-#     STEP = 4
-#     # 当前类别
-#     CATEGORY = None
-#
-#     def get(self, request):
-#         pass
-#
-#     def post(self, request):
-#         r = json.loads(request.body)
-#         category = r['category']
-#         # 若没有类别，先赋初值，通常是‘最新’类别
-#         if GoodsMainView.CATEGORY is None:
-#             GoodsMainView.CATEGORY = category
-#             # 针对‘最新’类别的处理
-#             if GoodsMainView.CATEGORY == '最新':
-#                 GoodsMainView.MAX_LENGTH = Goods.objects.all().count()
-#             else:
-#                 GoodsMainView.MAX_LENGTH = Goods.objects.filter(category=category).count()
-#         else:
-#             # 若当前类别和前端发生类别不同（前端发生类别切换）
-#             # 重赋值当前类别，重赋值当前查询长度为0，重赋值类别总数
-#             if GoodsMainView.CATEGORY != category:
-#                 GoodsMainView.CATEGORY = category
-#                 GoodsMainView.LENGTH = 0
-#                 # 针对‘最新’类别的处理
-#                 if GoodsMainView.CATEGORY == '最新':
-#                     GoodsMainView.MAX_LENGTH = Goods.objects.all().count()
-#                 else:
-#                     GoodsMainView.MAX_LENGTH = Goods.objects.filter(category=category).count()
-#         try:
-#             # 判断是否查询到当前类别总数
-#             if GoodsMainView.LENGTH < GoodsMainView.MAX_LENGTH:
-#                 # 若是最新类别，按id降序排序显示最新商品
-#                 if GoodsMainView.CATEGORY == '最新':
-#                     result_goods = Goods.objects.all().order_by("-id")[
-#                                    GoodsMainView.LENGTH:GoodsMainView.LENGTH + GoodsMainView.STEP]
-#                 # 若是其他类别，按id降序排序显示该类别商品
-#                 else:
-#                     result_goods = Goods.objects.filter(category=category).order_by("-id")[
-#                                    GoodsMainView.LENGTH:GoodsMainView.LENGTH + GoodsMainView.STEP]
-#                 # 查询一次后向后移动当前查询长度一个步长
-#                 GoodsMainView.LENGTH = GoodsMainView.LENGTH + GoodsMainView.STEP
-#                 print('MAXLEN' + str(GoodsMainView.MAX_LENGTH))
-#                 print('NOWLEN' + str(GoodsMainView.LENGTH))
-#             # 如果当前查询长度大于等于当前类别总数，返回空值
-#             else:
-#                 return JsonResponse({'data': None})
-#             # 将查询到的数据发送给前端
-#             goods = []
-#             for item in result_goods:
-#                 goods.append({
-#                     'id': item.id,
-#                     # 只获取第一张图片展示
-#                     'url': item.url.split('|', 1)[0],
-#                     'title': item.title,
-#                     'price': item.price
-#                 })
-#             return JsonResponse({'data': goods})
-#         except Goods.DoesNotExist:
-#             return JsonResponse({'data': None})
+# 商品搜索
+class GoodsSearchView(View):
+    # 步长
+    STEP = 6
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        r = json.loads(request.body)
+        title = r['title']
+        try:
+            goods_list = Goods.objects.filter(title__icontains=title).order_by("-id")
+            # 将查询到的数据发送给前端
+            goods = []
+            for item in goods_list:
+                goods.append({
+                    'id': item.id,
+                    'title': item.title,
+                    'price': item.price,
+                    # 只获取第一张图片展示
+                    'url': item.url.split('|', 1)[0]
+                })
+            return JsonResponse({'data': goods})
+        except Goods.DoesNotExist:
+            return JsonResponse({'data': None})
 
 
 # 商品推荐页

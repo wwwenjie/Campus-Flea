@@ -30,3 +30,11 @@ export function Detail (data) {
     data: data
   })
 }
+
+export function Browse (data) {
+  return request({
+    url: '/goods/browse',
+    method: 'post',
+    data: data
+  })
+}

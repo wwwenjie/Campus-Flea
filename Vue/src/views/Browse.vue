@@ -22,7 +22,7 @@
     </van-cell-group>
     <van-swipe :autoplay="3000">
       <van-swipe-item v-for="(image, index) in images" :key="index">
-        <img v-lazy="image"/>
+        <img v-lazy="image" class="img"/>
       </van-swipe-item>
     </van-swipe>
     <van-tabs @change="tabsChange" sticky animated swipeable>
@@ -31,10 +31,10 @@
           v-model="loading"
           :finished="finished"
           finished-text="没有更多了"
-          :immediate-check="false"
           @load="onLoad"
+          class="show-text"
         >
-          <van-grid :gutter="10" :column-num="2" :border="false" class="grid">
+          <van-grid :gutter="10" :column-num="2" :border="false">
             <van-grid-item
               @click="goToDetail(item.id)"
               v-for="item in goods"
@@ -51,6 +51,7 @@
 
 <script>
 import mixins from '@/mixins'
+import { Browse } from '@/api/goods'
 
 export default {
   name: 'Browse',
@@ -64,8 +65,8 @@ export default {
       show: false,
       dropdown: false,
       searchList: [],
-      loading: false,
-      finished: false,
+      loading: null,
+      finished: null,
       images: [
         'https://img.yzcdn.cn/vant/apple-1.jpg',
         'https://img.yzcdn.cn/vant/apple-2.jpg',
@@ -73,38 +74,9 @@ export default {
         'https://img.yzcdn.cn/vant/apple-4.jpg'
       ],
       tabs: ['最新', '书籍', '生活用品', '3C数码', '鞋服美妆', '兼职', '求助', '其他'],
-      goods: [
-        {
-          id: 1,
-          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: '免押金出租索尼E口24 1.4 GM大师定焦镜头全画幅 免押金出',
-          price: 1200
-        },
-        {
-          id: 2,
-          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: 'sss',
-          price: 50
-        },
-        {
-          id: 3,
-          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: 'sss',
-          price: 50
-        },
-        {
-          id: 4,
-          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: 'sss',
-          price: 50
-        },
-        {
-          id: 5,
-          url: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-          title: 'sss',
-          price: 50
-        }
-      ],
+      currentTab: '最新',
+      page: 1,
+      goods: [],
       searchitem: null
     }
   },
@@ -121,32 +93,53 @@ export default {
       this.searchList = []
     },
     onLoad () {
-      // axios
-      this.loading = false
-      // if r = null
-      this.finished = true
+      console.log('onloading')
+      // request data
+      this.loading = true
+      this.finished = false
+      Browse({
+        category: this.currentTab,
+        page: this.page
+      }).then(res => {
+        if (res.data.data) {
+          for (let item of res.data.data) {
+            this.goods.push(item)
+          }
+          this.loading = false
+          this.page++
+          console.log('request one')
+        } else {
+          console.log('null data,finished:')
+          this.finished = true
+          this.loading = false
+          console.log(this.finished)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     goToDetail (id) {
       this.setGoodId(id)
       this.$router.push({ name: 'detail' })
     },
     tabsChange (name, title) {
-      // refresh data
-      console.log(name)
-      console.log(title)
+      this.currentTab = title
+      this.page = 1
+      this.goods = []
+      this.onLoad()
     }
   }
 }
 </script>
 
 <style scoped>
-  img {
+  .img {
     width: 100%;
     height: 240px;
   }
 
-  .grid {
-    margin-bottom: 100px;
+  .show-text {
+    padding-bottom: 50px;
   }
 
   .search-list {

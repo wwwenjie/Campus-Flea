@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'apps.user',  # 注册user模块
     'apps.order',  # 订单order模块
     'apps.goods',  # 商品goods模块
+    'apps.collect',  # 商品collect模块
     'corsheaders',  # 跨域问题
 ]
 
@@ -49,7 +50,7 @@ ROOT_URLCONF = 'SchoolFleasPro.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'template')],  # 设置模板路径
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 设置模板路径
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,8 +74,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'schoolfleaspro',
-        'USER': 'schoolfleaspro',
-        'PASSWORD': 'schoolfleaspro',
+        # schoolfleaspro
+        'USER': 'root',
+        # schoolfleaspro
+        'PASSWORD': '117139',
         'HOST': 'localhost',
     }
 }

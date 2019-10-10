@@ -38,3 +38,11 @@ export function Browse (data) {
     data: data
   })
 }
+
+export function Search (data) {
+  return request({
+    url: '/goods/search',
+    method: 'post',
+    data: data
+  })
+}

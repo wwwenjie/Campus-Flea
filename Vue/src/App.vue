@@ -1,26 +1,28 @@
 <template>
   <div id="app">
-    <keep-alive>
-      <transition name="van-slide-left">
+    <transition name="van-slide-left">
+      <keep-alive>
         <router-view/>
-      </transition>
-    </keep-alive>
+      </keep-alive>
+    </transition>
   </div>
 </template>
 
 <script>
 import { Auth } from '@/api/user'
+import mixins from '@/mixins'
 
 export default {
+  mixins: [mixins],
   mounted () {
     Auth({
       uid: localStorage.getItem('uid'),
       token: localStorage.getItem('token')
     }).then(res => {
-      if (res.data.isSuccess) {
-        this.$store.commit('SET_LOGIN', {
-          isLogin: true
-        })
+      if (res.data.success) {
+        this.setUid(localStorage.getItem('uid'))
+        this.setToken(localStorage.getItem('token'))
+        this.setLogin({ isLogin: true })
       }
     }).catch(err => {
       console.log(err)

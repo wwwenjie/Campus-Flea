@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from db.base_model import BaseModel
 
@@ -11,20 +12,16 @@ class Goods(BaseModel):
         (1, '上架'),
         (2, '待审核'),
     )
-    GOODS_TYPE = (
-        ('book', '书籍'),
-        ('newest', '最新'),
-        ('daily', '生活用品'),
-        ('3c', '3c数码'),
-        ('dress', '鞋服美妆'),
-        ('job', '兼职'),
-        ('help', '求助')
-    )
-    goods_name = models.CharField(max_length=20, verbose_name='商品名称')
-    goods_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='商品价格')
-    goods_images = models.ImageField(upload_to='goods', verbose_name='商品图片')
-    goods_status = models.SmallIntegerField(default=0, choices=STATUS_CHOICE, verbose_name='商品状态')
-    goods_type = models.CharField(max_length=10, choices=GOODS_TYPE, verbose_name='商品类型')
+    status = models.IntegerField(default=0, choices=STATUS_CHOICE, verbose_name='商品状态')
+    title = models.CharField(max_length=40, default='', verbose_name='商品标题')
+    detail = models.TextField(default='', verbose_name='商品详情')
+    category = models.CharField(max_length=20, default='', verbose_name='商品类型')
+    url = models.TextField(default='', verbose_name='商品图片链接')
+    img_hash = models.TextField(default='', verbose_name='商品图片hash')
+    seller_id = models.IntegerField(default='', verbose_name='卖家id')
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), verbose_name='商品价格')
+    express = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), verbose_name='商品运费')
+    area = models.CharField(max_length=20, default='', verbose_name='发货地')
 
     class Meta:
         db_table = 'SchoolFleasPro_Goods'
@@ -39,15 +36,3 @@ class RecommendGoods(BaseModel):
         db_table = 'SchoolFleasPro_RecommendGoods'
         verbose_name = '推荐商品表'
         verbose_name_plural = verbose_name
-
-
-class detailGoods(BaseModel):
-    pass
-    # thum
-    # title
-    # price
-    # express
-    # sellerName
-    # sellerId
-    # location
-    # detail

@@ -4,7 +4,7 @@ import axios from 'axios'
 // 创建一个 axios 实例
 const service = axios.create({
   baseURL: process.env.VUE_APP_API,
-  timeout: 5000, // 请求超时时间
+  timeout: 10000, // 请求超时时间
   // 给后端发Json格式数据
   headers: {
     'Content-type': 'application/json'

@@ -29,7 +29,7 @@
                     var data = {
                         "goodsId": null, //商品id
                         "userId": 1,    // 用户id
-                        "type": 1     // 传1是收藏，传2是购物车
+                        "type": 2     // 传1是收藏，传2是购物车
                     }
                     {#params.append("search",data);#}
                     axios.post('http://127.0.0.1:8000/collect/search/',data)

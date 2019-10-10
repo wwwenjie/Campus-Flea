@@ -77,7 +77,7 @@ DATABASES = {
         # schoolfleaspro
         'USER': 'root',
         # schoolfleaspro
-        'PASSWORD': '117139',
+        'PASSWORD': 'schoolfleaspro',
         'HOST': 'localhost',
     }
 }

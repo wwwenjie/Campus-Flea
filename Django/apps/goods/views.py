@@ -54,6 +54,37 @@ class GoodsMainView(View):
             return JsonResponse({'data': None})
 
 
+# 商品详情页
+class GoodsDetailView(View):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        r = json.loads(request.body)
+        goods_id = r['id']
+        try:
+            goods = Goods.objects.get(id=goods_id)
+            # 获取卖家名
+            try:
+                seller_name = User.objects.get(id=goods.seller_id).username
+            except User.DoesNotExist:
+                return JsonResponse({'success': bool(False)})
+            # 分割图片url
+            url = goods.url.split('|')
+            return JsonResponse({
+                'title': goods.title,
+                'detail': goods.detail,
+                'url': url,
+                'price': goods.price,
+                'express': goods.express,
+                'sellerId': goods.seller_id,
+                'sellerName': seller_name,
+                'area': goods.area
+            })
+        except Goods.DoesNotExist:
+            return JsonResponse({'success': bool(False)})
+
+
 # 商品搜索
 class GoodsSearchView(View):
     # 步长
@@ -80,15 +111,6 @@ class GoodsSearchView(View):
             return JsonResponse({'data': goods})
         except Goods.DoesNotExist:
             return JsonResponse({'data': None})
-
-
-# 商品推荐页
-class GoodsRecommendView(View):
-    def get(self, request):
-        pass
-
-    def post(self, request):
-        print(request)
 
 
 # 商品上传
@@ -131,33 +153,10 @@ class GoodsUploadView(View):
         return JsonResponse({'success': bool(True)})
 
 
-# 商品详情页
-class GoodsDetailView(View):
+# 商品推荐页
+class GoodsRecommendView(View):
     def get(self, request):
         pass
 
     def post(self, request):
-        r = json.loads(request.body)
-        goods_id = r['id']
-        try:
-            goods = Goods.objects.get(id=goods_id)
-            # 获取卖家名
-            try:
-                seller_name = User.objects.get(id=goods.seller_id).username
-            except User.DoesNotExist:
-                return JsonResponse({'success': bool(False)})
-            # 分割图片url
-            url = goods.url.split('|')
-            print(url)
-            return JsonResponse({
-                'title': goods.title,
-                'detail': goods.detail,
-                'url': url,
-                'price': goods.price,
-                'express': goods.express,
-                'sellerId': goods.seller_id,
-                'sellerName': seller_name,
-                'area': goods.area
-            })
-        except Goods.DoesNotExist:
-            return JsonResponse({'success': bool(False)})
+        print(request)

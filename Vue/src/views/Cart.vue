@@ -7,7 +7,7 @@
     />
     <van-checkbox-group class="card-goods" v-model="checkedGoods">
       <van-checkbox
-        class="card-goods__item"
+        class="card-goods__item card"
         v-for="item in goods"
         :key="item.id"
         :name="item.id"
@@ -15,10 +15,9 @@
         <van-swipe-cell>
           <van-card
             :title="item.title"
-            :desc="item.desc"
-            :num="item.num"
+            :desc="item.seller"
             :price="formatPrice(item.price)"
-            :url="item.url"
+            :thumb="item.url"
           >
           </van-card>
           <template slot="right">
@@ -27,6 +26,7 @@
         </van-swipe-cell>
       </van-checkbox>
     </van-checkbox-group>
+
     <van-submit-bar
       :loading="loading"
       :price="totalPrice"
@@ -58,21 +58,21 @@ export default {
       goods: [{
         id: '1',
         title: '进口香蕉',
-        desc: '约250g，2根',
+        seller: '卖家',
         price: 200,
         num: 1,
         url: 'https://img.yzcdn.cn/public_files/2017/10/24/2f9a36046449dafb8608e99990b3c205.jpeg'
       }, {
         id: '2',
         title: '陕西蜜梨',
-        desc: '约600g',
+        seller: '卖家',
         price: 690,
         num: 1,
         url: 'https://img.yzcdn.cn/public_files/2017/10/24/f6aabd6ac5521195e01e8e89ee9fc63f.jpeg'
       }, {
         id: '3',
         title: '美国伽力果',
-        desc: '约680g/3个',
+        seller: '卖家',
         price: 2680,
         num: 1,
         url: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
@@ -176,6 +176,14 @@ export default {
 
     .removeButton {
       height: 100%;
+    }
+
+    .card {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 20px;
     }
   }
 </style>

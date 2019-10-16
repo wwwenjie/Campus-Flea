@@ -20,7 +20,7 @@
             :thumb="item.url"
           >
             <template slot="num">
-              <van-button  @click.stop="" @click="onClickContact(item.id)" plain hairline round type="info" text="联系卖家" style="z-index: 100"/>
+              <van-button @click.stop="" @click="onClickContact(item.id)" plain hairline round type="info" text="联系卖家"/>
             </template>
           </van-card>
           <template slot="right">
@@ -124,6 +124,9 @@ export default {
       this.nav = '购物车'
       // get goods by uid
     }
+  },
+  deactivated () {
+    this.$destroy()
   }
 }
 </script>

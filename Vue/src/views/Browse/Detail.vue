@@ -5,7 +5,19 @@
     </div>
     <van-swipe class="goods-swipe" :autoplay="3000">
       <van-swipe-item v-for="urlItem in url" :key="urlItem">
-        <img :src="urlItem" class="img">
+        <van-image
+          lazy-load
+          :src="urlItem"
+          class="img"
+        >
+          <template v-slot:loading>
+            <van-loading type="spinner" size="30"/>
+          </template>
+          <template v-slot:error>
+            <van-icon name="photo-o" size="30"/>
+            暂无图片
+          </template>
+        </van-image>
       </van-swipe-item>
     </van-swipe>
 
@@ -120,7 +132,7 @@ export default {
     &-swipe {
       .img {
         display: block;
-        width:100%;
+        width: 100%;
         height: auto;
         min-height: 35vh;
         max-height: 70vh;

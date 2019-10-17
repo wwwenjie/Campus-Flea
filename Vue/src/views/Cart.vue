@@ -7,18 +7,21 @@
     />
     <van-checkbox-group class="card-goods" v-model="checkedGoods">
       <van-checkbox
-        class="card-goods__item card"
+        class="card-goods__item"
         v-for="item in goods"
         :key="item.id"
         :name="item.id"
       >
+        <span class="card-goods__item-seller-name">{{item.seller}}</span>
         <van-swipe-cell>
           <van-card
             :title="item.title"
-            :desc="item.seller"
-            :price="formatPrice(item.price)"
+            :price="item.price"
             :thumb="item.url"
           >
+            <template slot="num">
+              <van-button @click.stop="" @click="onClickContact(item.id)" plain hairline round type="info" text="联系卖家"/>
+            </template>
           </van-card>
           <template slot="right">
             <van-button @click="onClickRemove(item.id)" square type="danger" text="删除" class="cart-remove-button"/>
@@ -60,21 +63,18 @@ export default {
         title: '进口香蕉',
         seller: '卖家',
         price: 200,
-        num: 1,
         url: 'https://img.yzcdn.cn/public_files/2017/10/24/2f9a36046449dafb8608e99990b3c205.jpeg'
       }, {
         id: '2',
         title: '陕西蜜梨',
         seller: '卖家',
-        price: 690,
-        num: 1,
+        price: 690.05,
         url: 'https://img.yzcdn.cn/public_files/2017/10/24/f6aabd6ac5521195e01e8e89ee9fc63f.jpeg'
       }, {
         id: '3',
         title: '美国伽力果',
         seller: '卖家',
         price: 2680,
-        num: 1,
         url: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
       }]
     }
@@ -85,18 +85,17 @@ export default {
       return '结算' + (count ? `(${count})` : '')
     },
     totalPrice () {
-      return this.goods.reduce((total, item) => total + (this.checkedGoods.indexOf(item.id) !== -1 ? item.price : 0), 0)
+      return this.goods.reduce((total, item) => total + (this.checkedGoods.indexOf(item.id) !== -1 ? item.price * 100 : 0), 0)
     }
   },
   methods: {
-    formatPrice (price) {
-      return (price / 100).toFixed(2)
-    },
     onSubmit () {
       this.loading = true
     },
     onClickRemove () {
       this.goods.pop()
+    },
+    onClickContact () {
     },
     changeAllChecked () {
       if (this.checkedAll) {
@@ -105,17 +104,16 @@ export default {
           this.checkedGoods.push(item.id)
         }
       } else {
-        this.checkedGoods = []
+        // dont remove all checked
+        if (this.checkedGoods.length !== this.goods.length - 1) {
+          this.checkedGoods = []
+        }
       }
     }
   },
   watch: {
     checkedGoods: function () {
-      if (this.checkedGoods.length === this.goods.length) {
-        this.checkedAll = true
-      } else {
-        this.checkedAll = false
-      }
+      this.checkedAll = this.checkedGoods.length === this.goods.length
     }
   },
   mounted () {
@@ -126,6 +124,9 @@ export default {
       this.nav = '购物车'
       // get goods by uid
     }
+  },
+  deactivated () {
+    this.$destroy()
   }
 }
 </script>
@@ -134,6 +135,7 @@ export default {
   .cart {
     &-remove-button {
       height: 100%;
+      margin-left: 10px;
     }
 
     &-select-all {
@@ -153,6 +155,16 @@ export default {
       position: relative;
       background-color: #fafafa;
       margin-top: 2vh;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 20px;
+
+      &-seller-name {
+        font-weight: 500;
+        padding-left: 15px;
+      }
 
       .van-checkbox__label {
         width: 100%;
@@ -169,21 +181,23 @@ export default {
         margin-top: -10px;
       }
 
+      /*remove border*/
+
+      .van-card {
+        background-color: rgba(0, 0, 0, 0);
+      }
+
+      .van-card__title {
+        font-size: 1.5em;
+        line-height: normal;
+      }
+
       .van-card__price {
+        position: absolute;
+        bottom: 5px;
+        font-size: 1.5em;
         color: #f44;
       }
-    }
-
-    .removeButton {
-      height: 100%;
-    }
-
-    .card {
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-      transition: 0.3s;
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 20px;
     }
   }
 </style>

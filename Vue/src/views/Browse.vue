@@ -18,7 +18,7 @@
       </van-search>
     </form>
     <van-cell-group v-if="dropdown" class="search-list">
-      <van-cell v-for="item of searchList" :key="item" :title="item"/>
+      <van-cell v-for="item of searchList" @click="onSearch(item)" :key="item" :title="item"/>
     </van-cell-group>
     <van-swipe :autoplay="3000">
       <van-swipe-item v-for="(image, index) in images" :key="index">
@@ -51,7 +51,7 @@
 
 <script>
 import mixins from '@/mixins'
-import { Browse } from '@/api/goods'
+import { Browse, Search } from '@/api/goods'
 
 export default {
   name: 'Browse',
@@ -81,11 +81,34 @@ export default {
     }
   },
   methods: {
-    onSearch: function () {
+    onSearch: function (content = this.searchitem) {
       // onSearch
+      Search({
+        title: content
+      }).then(res => {
+        if (res.data.data) {
+          this.goods = []
+          for (let item of res.data.data) {
+            this.goods.push(item)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     searchLive (value) {
-      this.searchList.push(value)
+      Search({
+        title: value
+      }).then(res => {
+        if (res.data.data) {
+          this.searchList = []
+          for (let item of res.data.data) {
+            this.searchList.push(item.title)
+          }
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     dropdownShow () {
       this.show = !this.show

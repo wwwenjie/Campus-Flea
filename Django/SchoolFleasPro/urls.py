@@ -1,10 +1,9 @@
 from django.contrib import admin
-from django.urls import path
-from django.conf.urls import url, include
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^user/', include(('user.urls', 'user'), namespace='user')),  # 用户模块URL
-    url(r'^goods/', include(('goods.urls', 'goods'), namespace='goods')),  # 商品模块URL
-    path('collect/', include(('collect.urls', 'collect'), namespace='collect')),  # 收藏夹
+    path('user/', include(('user.urls', 'user'))),  # 用户模块URL
+    path('goods/', include(('goods.urls', 'goods'))),  # 商品模块URL
+    path('collect/', include(('collect.urls', 'collect')))  # 收藏购物URL
 ]

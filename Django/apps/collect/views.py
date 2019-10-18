@@ -1,16 +1,13 @@
 import json
-from typing import Dict, Any
 
 from django.core.serializers import serialize
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
 
 # Create your views here.
 from apps.collect.models import Collect, ShopCart
 
 
 def search(request):
-
     data = []
     if request.method == "GET":
         return HttpResponse("不接受get方法！")
@@ -104,7 +101,3 @@ def search(request):
         else:
             # 处理错误信息
             return HttpResponse("error")
-
-
-def index(request):
-    return render(request, 'test.html')

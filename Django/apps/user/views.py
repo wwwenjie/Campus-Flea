@@ -32,135 +32,119 @@ import hashlib
 
 
 # Create your views here.
-class RegisterView(View):
-    def get(self, request):
-        pass
-
-    def post(self, request):
-        r = json.loads(request.body)
-        account = r['account']
-        password = r['password']
-        code = r['code']
-        if judge_type(account) is None:
-            return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
-        # 从redis缓存中读取缓存信息 account唯一
-        check_code = cache.get(account)
-        print(check_code)
-        # 验证验证码是否正确
-        if check_code == code:
-            # 新加用户
-            user = User()
-            user.username = 'Sfleas_' + shuffle_str(True)[0:6]
-            # 判断账号类型
-            if judge_type(account) == 'phone':
-                user.phone = account
-            else:
-                user.email = account
-            # 密码加密
-            user.password = encrypt(password)
-            print(user.password)
-            # 保存
-            user.save()
-            return JsonResponse({'success': bool(True), 'msg': "注册成功！"})
+def register(request):
+    r = json.loads(request.body)
+    account = r['account']
+    password = r['password']
+    code = r['code']
+    if judge_type(account) is None:
+        return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
+    # 从redis缓存中读取缓存信息 account唯一
+    check_code = cache.get(account)
+    print(check_code)
+    # 验证验证码是否正确
+    if check_code == code:
+        # 新加用户
+        user = User()
+        user.username = 'Sfleas_' + shuffle_str(True)[0:6]
+        # 判断账号类型
+        if judge_type(account) == 'phone':
+            user.phone = account
         else:
-            return JsonResponse({'success': bool(False), 'msg': "验证码错误！"})
+            user.email = account
+        # 密码加密
+        user.password = encrypt(password)
+        print(user.password)
+        # 保存
+        user.save()
+        return JsonResponse({'success': bool(True), 'msg': "注册成功！"})
+    else:
+        return JsonResponse({'success': bool(False), 'msg': "验证码错误！"})
 
 
-class SendVerifyView(View):
-    def get(self, request):
-        pass
+def send_verify(request):
+    # 获取传过来的account
+    r = json.loads(request.body)
+    account = r['account']
+    type = judge_type(account)
+    if type is None:
+        return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
+    elif type == 'email':
+        email = account
+        # 判断该邮箱是否已经被注册
+        try:
+            if User.objects.get(email=email):
+                return JsonResponse({'success': bool(False), 'msg': "该邮箱已被注册！"})
+        except User.DoesNotExist:
+            pass
 
-    def post(self, request):
-        # 获取传过来的account
-        r = json.loads(request.body)
-        account = r['account']
-        type = judge_type(account)
-        if type is None:
-            return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
-        elif type == 'email':
-            email = account
-            # 判断该邮箱是否已经被注册
-            try:
-                if User.objects.get(email=email):
-                    return JsonResponse({'success': bool(False), 'msg': "该邮箱已被注册！"})
-            except User.DoesNotExist:
-                pass
+        # 生成验证码
+        check_code = shuffle_str()[0:6]  # 截取0-6位
+        # 异步发送邮件
+        send_register_active_email.delay(email, check_code)
 
-            # 生成验证码
-            check_code = shuffle_str()[0:6]  # 截取0-6位
-            # 异步发送邮件
-            send_register_active_email.delay(email, check_code)
+        # 缓存到redis 设置5分钟过期
+        cache.set(email, check_code, 300)
+        return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
+    else:
+        phone = account
+        # 判断手机该是否已经被注册
+        try:
+            if User.objects.get(phone=phone):
+                return JsonResponse({'success': bool(False), 'msg': "该手机号已被注册！"})
+        except User.DoesNotExist:
+            pass
 
+        # 生成验证码
+        check_code = shuffle_str()[0:6]  # 截取0-6位
+
+        # 发送短信
+        resp = send_sms(phone, check_code)
+        if resp == 'OK':
             # 缓存到redis 设置5分钟过期
-            cache.set(email, check_code, 300)
+            cache.set(phone, check_code, 300)
             return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
         else:
-            phone = account
-            # 判断手机该是否已经被注册
-            try:
-                if User.objects.get(phone=phone):
-                    return JsonResponse({'success': bool(False), 'msg': "该手机号已被注册！"})
-            except User.DoesNotExist:
-                pass
-
-            # 生成验证码
-            check_code = shuffle_str()[0:6]  # 截取0-6位
-
-            # 发送短信
-            resp = send_sms(phone, check_code)
-            if resp == 'OK':
-                # 缓存到redis 设置5分钟过期
-                cache.set(phone, check_code, 300)
-                return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
-            else:
-                return JsonResponse({'success': bool(False), 'msg': resp})
+            return JsonResponse({'success': bool(False), 'msg': resp})
 
 
-class LoginView(View):
-    def get(self, request):
-        pass
-
-    def post(self, request):
-        r = json.loads(request.body)
-        account = r['account']
-        password = r['password']
-        # 获取数据
-        try:
-            if judge_type(account) == 'email':
-                user = User.objects.get(email=account)
-            else:
-                user = User.objects.get(phone=account)
-            # 验证密码
-            print(encrypt(password))
-            if encrypt(password) == user.password:
-                # 重写token
-                token = encrypt(user.id, str(datetime.now()))
-                # 保存token
-                user.user_token = token
-                user.save()
-                return JsonResponse({'uid': user.id, 'success': bool(True), 'token': token})
-            else:
-                return JsonResponse({'success': bool(False), 'msg': '账号或密码错误'})
-        except User.DoesNotExist:
-            return JsonResponse({'success': bool(False), 'msg': '账户不存在'})
+def login(request):
+    r = json.loads(request.body)
+    account = r['account']
+    password = r['password']
+    # 获取数据
+    try:
+        if judge_type(account) == 'email':
+            user = User.objects.get(email=account)
+        else:
+            user = User.objects.get(phone=account)
+        # 验证密码
+        print(encrypt(password))
+        if encrypt(password) == user.password:
+            # 重写token
+            token = encrypt(user.id, str(datetime.now()))
+            # 保存token
+            user.user_token = token
+            user.save()
+            return JsonResponse({'uid': user.id, 'success': bool(True), 'token': token})
+        else:
+            return JsonResponse({'success': bool(False), 'msg': '账号或密码错误'})
+    except User.DoesNotExist:
+        return JsonResponse({'success': bool(False), 'msg': '账户不存在'})
 
 
-class AuthView(View):
-    def get(self, request):
-        pass
-
-    def post(self, request):
-        r = json.loads(request.body)
-        uid = r['uid']
-        token = r['token']
-        try:
-            user = User.objects.get(id=uid)
-            if user.user_token == token:
-                return JsonResponse({'success': bool(True)})
-            else:
-                return JsonResponse({'success': bool(False)})
-        except User.DoesNotExist:
+def auth(request):
+    r = json.loads(request.body)
+    uid = r['uid']
+    token = r['token']
+    try:
+        user = User.objects.get(id=uid)
+        if user.user_token == token:
+            return JsonResponse({'success': bool(True)})
+        else:
             return JsonResponse({'success': bool(False)})
+    except User.DoesNotExist:
+        return JsonResponse({'success': bool(False)})
 
 
 def shuffle_str(alphabet=None):

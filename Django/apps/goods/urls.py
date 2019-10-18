@@ -1,10 +1,9 @@
-from django.conf.urls import url
-from apps.goods.views import GoodsMainView, GoodsUploadView, GoodsDetailView, GoodsSearchView
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    url(r'^browse$', GoodsMainView.as_view(), name='goodsBrowse'),
-    url(r'^detail$', GoodsDetailView.as_view(), name='goodsDetail'),
-    url(r'^search$', GoodsSearchView.as_view(), name='goodsSearch'),
-    url(r'^browse$', GoodsMainView.as_view(), name='goodsBrowse'),
-    url(r'^upload$', GoodsUploadView.as_view(), name='goodsUpload')
+    path('browse', views.goods_browse),
+    path('detail', views.goods_detail),
+    path('search', views.goods_search),
+    path('upload', views.goods_upload)
 ]

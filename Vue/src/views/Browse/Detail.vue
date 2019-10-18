@@ -72,6 +72,7 @@ import Vue from 'vue'
 import { Toast } from 'vant'
 import mixins from '@/mixins'
 import { Detail } from '@/api/goods'
+import { CollectCart } from '@/api/collect'
 
 Vue.use(Toast)
 
@@ -98,7 +99,20 @@ export default {
       Toast.success('收藏成功')
     },
     addToCart () {
-      Toast.success('已加入购物车')
+      CollectCart({
+        goodsId: this.goodId,
+        uid: this.uid,
+        type: 1,
+        operate: 1
+      }).then(res => {
+        if (res.success) {
+          Toast.success(res.msg)
+        } else {
+          Toast.fail(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     buy () {
       // add goodId to change cart's style to buy

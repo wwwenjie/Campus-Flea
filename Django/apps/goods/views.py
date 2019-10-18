@@ -59,7 +59,7 @@ def goods_detail(request):
         try:
             seller_name = User.objects.get(id=goods.seller_id).username
         except User.DoesNotExist:
-            return JsonResponse({'success': bool(False)})
+            return JsonResponse({'success': False})
         # 分割图片url
         url = goods.url.split('|')
         return JsonResponse({
@@ -73,7 +73,7 @@ def goods_detail(request):
             'area': goods.area
         })
     except Goods.DoesNotExist:
-        return JsonResponse({'success': bool(False)})
+        return JsonResponse({'success': False})
 
 
 # 商品搜索
@@ -130,4 +130,4 @@ def goods_upload(request):
     # 去除最后多余的,
     goods.area = area[:-1]
     goods.save()
-    return JsonResponse({'success': bool(True)})
+    return JsonResponse({'success': True})

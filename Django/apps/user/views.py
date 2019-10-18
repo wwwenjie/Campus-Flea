@@ -1,12 +1,10 @@
 from datetime import datetime
 from random import shuffle
-# 导入View抽象类post,get方法
-from django.views.generic import View
 
 from django.http import JsonResponse
 
 # 导入数据库模型
-from apps.user.models import User  # 这李绝对路径会报错，我也不知道为啥，百度的
+from apps.user.models import User
 
 # 异步发邮件
 from celery_tasks.tasks import send_register_active_email
@@ -14,7 +12,6 @@ from celery_tasks.tasks import send_register_active_email
 # 导入setting中的密文SECRET_KEY
 from django.conf import settings
 
-from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
 # Json解析库
@@ -38,7 +35,7 @@ def register(request):
     password = r['password']
     code = r['code']
     if judge_type(account) is None:
-        return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
+        return JsonResponse({'success': False, 'msg': "账号格式有误！"})
     # 从redis缓存中读取缓存信息 account唯一
     check_code = cache.get(account)
     print(check_code)
@@ -57,9 +54,9 @@ def register(request):
         print(user.password)
         # 保存
         user.save()
-        return JsonResponse({'success': bool(True), 'msg': "注册成功！"})
+        return JsonResponse({'success': True, 'msg': "注册成功！"})
     else:
-        return JsonResponse({'success': bool(False), 'msg': "验证码错误！"})
+        return JsonResponse({'success': False, 'msg': "验证码错误！"})
 
 
 def send_verify(request):
@@ -68,13 +65,13 @@ def send_verify(request):
     account = r['account']
     type = judge_type(account)
     if type is None:
-        return JsonResponse({'success': bool(False), 'msg': "账号格式有误！"})
+        return JsonResponse({'success': False, 'msg': "账号格式有误！"})
     elif type == 'email':
         email = account
         # 判断该邮箱是否已经被注册
         try:
             if User.objects.get(email=email):
-                return JsonResponse({'success': bool(False), 'msg': "该邮箱已被注册！"})
+                return JsonResponse({'success': False, 'msg': "该邮箱已被注册！"})
         except User.DoesNotExist:
             pass
 
@@ -85,13 +82,13 @@ def send_verify(request):
 
         # 缓存到redis 设置5分钟过期
         cache.set(email, check_code, 300)
-        return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
+        return JsonResponse({'success': True, 'msg': '发送成功！'})
     else:
         phone = account
         # 判断手机该是否已经被注册
         try:
             if User.objects.get(phone=phone):
-                return JsonResponse({'success': bool(False), 'msg': "该手机号已被注册！"})
+                return JsonResponse({'success': False, 'msg': "该手机号已被注册！"})
         except User.DoesNotExist:
             pass
 
@@ -103,9 +100,9 @@ def send_verify(request):
         if resp == 'OK':
             # 缓存到redis 设置5分钟过期
             cache.set(phone, check_code, 300)
-            return JsonResponse({'success': bool(True), 'msg': '发送成功！'})
+            return JsonResponse({'success': True, 'msg': '发送成功！'})
         else:
-            return JsonResponse({'success': bool(False), 'msg': resp})
+            return JsonResponse({'success': False, 'msg': resp})
 
 
 def login(request):
@@ -126,11 +123,11 @@ def login(request):
             # 保存token
             user.user_token = token
             user.save()
-            return JsonResponse({'uid': user.id, 'success': bool(True), 'token': token})
+            return JsonResponse({'uid': user.id, 'success': True, 'token': token})
         else:
-            return JsonResponse({'success': bool(False), 'msg': '账号或密码错误'})
+            return JsonResponse({'success': False, 'msg': '账号或密码错误'})
     except User.DoesNotExist:
-        return JsonResponse({'success': bool(False), 'msg': '账户不存在'})
+        return JsonResponse({'success': False, 'msg': '账户不存在'})
 
 
 def auth(request):
@@ -140,11 +137,11 @@ def auth(request):
     try:
         user = User.objects.get(id=uid)
         if user.user_token == token:
-            return JsonResponse({'success': bool(True)})
+            return JsonResponse({'success': True})
         else:
-            return JsonResponse({'success': bool(False)})
+            return JsonResponse({'success': False})
     except User.DoesNotExist:
-        return JsonResponse({'success': bool(False)})
+        return JsonResponse({'success': False})
 
 
 def shuffle_str(alphabet=None):

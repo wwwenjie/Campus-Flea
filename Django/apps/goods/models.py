@@ -24,13 +24,13 @@ class Goods(BaseModel):
     area = models.CharField(max_length=20, default='', verbose_name='发货地')
 
     class Meta:
-        db_table = 'SchoolFleasPro_Goods'
+        db_table = 'SchoolFleasPro_goods'
         verbose_name = '商品表'
         verbose_name_plural = verbose_name
 
 
 class RecommendGoods(BaseModel):
-    goods_name = models.ForeignKey('Goods', verbose_name='商品名称', on_delete=models.CASCADE)
+    goods_name = models.ForeignKey(Goods, verbose_name='商品id', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'SchoolFleasPro_RecommendGoods'

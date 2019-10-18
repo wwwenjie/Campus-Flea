@@ -1,6 +1,4 @@
 from django.db import models
-# 导入django自带的user抽象类
-# from django.contrib.auth.models import AbstractUser
 # 导入定义的基类
 from db.base_model import BaseModel
 
@@ -9,7 +7,6 @@ from db.base_model import BaseModel
 
 class User(BaseModel):
     """用户模型类"""
-    # user_id=models.IntegerField(verbose_name='用户id')
     username = models.CharField(max_length=20, verbose_name='用户名称')
     email = models.CharField(max_length=20, verbose_name='邮件')
     password = models.CharField(max_length=500, verbose_name='用户密码')

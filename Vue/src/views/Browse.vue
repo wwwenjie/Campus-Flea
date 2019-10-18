@@ -86,9 +86,9 @@ export default {
       Search({
         title: content
       }).then(res => {
-        if (res.data.data) {
+        if (res.data) {
           this.goods = []
-          for (let item of res.data.data) {
+          for (let item of res.data) {
             this.goods.push(item)
           }
         }
@@ -100,9 +100,9 @@ export default {
       Search({
         title: value
       }).then(res => {
-        if (res.data.data) {
+        if (res.data) {
           this.searchList = []
-          for (let item of res.data.data) {
+          for (let item of res.data) {
             this.searchList.push(item.title)
           }
         }
@@ -123,8 +123,8 @@ export default {
         category: this.currentTab,
         page: this.page
       }).then(res => {
-        if (res.data.data) {
-          for (let item of res.data.data) {
+        if (res.data) {
+          for (let item of res.data) {
             this.goods.push(item)
           }
           this.loading = false

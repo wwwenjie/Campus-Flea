@@ -19,7 +19,7 @@ export default {
       uid: localStorage.getItem('uid'),
       token: localStorage.getItem('token')
     }).then(res => {
-      if (res.data.success) {
+      if (res.success) {
         this.setUid(localStorage.getItem('uid'))
         this.setToken(localStorage.getItem('token'))
         this.setLogin({ isLogin: true })

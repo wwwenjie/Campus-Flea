@@ -110,14 +110,14 @@ export default {
     Detail({
       id: this.goodId
     }).then(res => {
-      this.title = res.data.title
-      this.detail = res.data.detail
-      this.url = res.data.url
-      this.price = res.data.price
-      this.express = res.data.express
-      this.sellerId = res.data.sellerId
-      this.sellerName = res.data.sellerName
-      this.area = res.data.area
+      this.title = res.title
+      this.detail = res.detail
+      this.url = res.url
+      this.price = res.price
+      this.express = res.express
+      this.sellerId = res.sellerId
+      this.sellerName = res.sellerName
+      this.area = res.area
     }).catch(err => {
       console.log(err)
     })

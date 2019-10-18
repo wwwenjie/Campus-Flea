@@ -152,12 +152,11 @@ export default {
       let data = new FormData()
       data.append('smfile', file.file)
       ImgUpload(data).then((res) => {
-        data = res.data
-        if (data.success) {
+        if (res.success) {
           Notify({ type: 'success', message: '上传成功' })
-          this.url.push({ url: data.data.url, hash: data.data.hash })
+          this.url.push({ url: res.data.url, hash: res.data.hash })
         } else {
-          Notify({ type: 'danger', message: data.message })
+          Notify({ type: 'danger', message: res.message })
           this.fileList.pop()
         }
       }).catch(err => {
@@ -190,7 +189,7 @@ export default {
         express: this.express,
         area: this.area
       }).then(res => {
-        if (res.data.success) {
+        if (res.success) {
           Toast.success('发布成功')
         } else {
           Toast.fail('发布失败')

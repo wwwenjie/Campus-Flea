@@ -112,10 +112,10 @@ export default {
       Verify({
         account: this.account
       }).then(res => {
-        if (res.data.success) {
-          Toast.success(res.data.msg)
+        if (res.success) {
+          Toast.success(res.msg)
         } else {
-          Toast.fail(res.data.msg)
+          Toast.fail(res.msg)
         }
       }).catch(err => {
         console.log(err)
@@ -129,16 +129,16 @@ export default {
             account: this.account,
             password: this.password
           }).then(res => {
-            if (res.data.success) {
+            if (res.success) {
               Toast.success('登陆成功')
-              localStorage.setItem('uid', res.data.uid)
-              this.setUid(res.data.uid)
-              localStorage.setItem('token', res.data.token)
-              this.setToken(res.data.token)
+              localStorage.setItem('uid', res.uid)
+              this.setUid(res.uid)
+              localStorage.setItem('token', res.token)
+              this.setToken(res.token)
               this.setLogin({ isLogin: true })
               this.routerBack()
             } else {
-              Toast.fail(res.data.msg)
+              Toast.fail(res.msg)
             }
           }).catch(err => {
             console.log(err)
@@ -155,12 +155,12 @@ export default {
             password: this.password,
             code: this.code
           }).then(res => {
-            console.log(res.data.success)
-            if (res.data.success) {
-              Toast.success(res.data.msg)
+            console.log(res.success)
+            if (res.success) {
+              Toast.success(res.msg)
               this.status = 'login'
             } else {
-              Toast.fail(res.data.msg)
+              Toast.fail(res.msg)
             }
           }).catch(err => {
             console.log(err)

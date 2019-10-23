@@ -14,7 +14,7 @@
 
     <van-cell-group class="user-group">
       <van-cell icon="gold-coin-o" title="购物车" is-link to="cart"/>
-      <van-cell icon="gift-o" title="我收藏的" is-link/>
+      <van-cell icon="gift-o" title="我收藏的" is-link to="cart"/>
       <van-cell icon="gift-o" title="我的账号" is-link to="user/edit"/>
     </van-cell-group>
     <van-cell-group class="user-group">

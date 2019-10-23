@@ -3,7 +3,7 @@ import json
 from django.http import JsonResponse
 
 # Create your views here.
-from apps.collect.models import Collect, ShopCart
+from apps.collect.models import Collect, ShopCart, Goods, User
 
 
 def search(request):
@@ -16,7 +16,8 @@ def search(request):
     operate = r['operate']
     # 为空时返回列表
     if goods_id is None:
-        return JsonResponse({"data": get_data(uid, judge_type)})
+        result = get_data(uid, judge_type)
+        return JsonResponse({"success": result['success'], "data": result['data']})
     # 不为空时添加或者删除
     else:
         result = delete(uid, goods_id, judge_type) if operate == 0 else add(uid, goods_id, judge_type)
@@ -30,8 +31,20 @@ def get_data(uid, judge_type):
         result = ShopCart.objects.filter(user_id=uid)
     data = []
     for item in result:
-        data.append(item.goods_id)
-    return data
+        goods = Goods.objects.filter(id=item.goods_id)[0]
+        seller_name = User.objects.get(id=goods.seller_id).username
+        data.append({
+            'id': goods.id,
+            'title': goods.title,
+            'price': goods.price,
+            'url': goods.url.split('|', 1)[0],
+            'sellerId': goods.seller_id,
+            'sellerName': seller_name
+        })
+    if len(data) == 0:
+        return {'success': False, 'data': None}
+    else:
+        return {'success': True, 'data': data}
 
 
 def add(uid, goods_id, judge_type):

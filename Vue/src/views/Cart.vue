@@ -12,7 +12,7 @@
         :key="item.id"
         :name="item.id"
       >
-        <span class="card-goods__item-seller-name">{{item.seller}}</span>
+        <span class="card-goods__item-seller-name">{{item.sellerName}}</span>
         <van-swipe-cell>
           <van-card
             :title="item.title"
@@ -45,15 +45,12 @@
 
 <script>
 import Vue from 'vue'
-import { SwipeCell } from 'vant'
-import { Toast } from 'vant'
+import { SwipeCell, Toast } from 'vant'
 import mixins from '@/mixins'
 import { Detail } from '@/api/goods'
 import { CollectCart } from '@/api/collect'
 
-Vue.use(Toast)
-
-Vue.use(SwipeCell)
+Vue.use(SwipeCell, Toast)
 export default {
   name: 'Cart',
   mixins: [mixins],
@@ -63,28 +60,7 @@ export default {
       checkedAll: false,
       checkedGoods: [],
       loading: false,
-      goods: [{
-        id: '1',
-        title: '进口香蕉',
-        seller: '卖家',
-        sellerId: '卖家',
-        price: 200,
-        url: 'https://img.yzcdn.cn/public_files/2017/10/24/2f9a36046449dafb8608e99990b3c205.jpeg'
-      }, {
-        id: '2',
-        title: '陕西蜜梨',
-        seller: '卖家',
-        sellerId: '卖家',
-        price: 690.05,
-        url: 'https://img.yzcdn.cn/public_files/2017/10/24/f6aabd6ac5521195e01e8e89ee9fc63f.jpeg'
-      }, {
-        id: '3',
-        title: '美国伽力果',
-        seller: '卖家',
-        sellerId: '卖家',
-        price: 2680,
-        url: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
-      }]
+      goods: []
     }
   },
   computed: {
@@ -137,7 +113,7 @@ export default {
         item.price = res.price
         item.url = res.url
         item.sellerId = res.sellerId
-        item.seller = res.seller
+        item.sellerName = res.sellerName
         this.goods.push(item)
       }).catch(err => {
         console.log(err)
@@ -146,13 +122,16 @@ export default {
       this.nav = '购物车'
       // get goods by uid
       CollectCart({
+        goodsId: null,
         uid: this.uid,
-        type: 1
+        type: 1,
+        operate: null
       }).then(res => {
         if (res.success) {
-          res.data = this.goods
+          console.log(res.data)
+          this.goods = res.data
         } else {
-
+          Toast.fail('购物车为空')
         }
       }).catch(err => {
         console.log(err)

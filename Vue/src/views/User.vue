@@ -1,6 +1,23 @@
 <template>
   <div>
-    <img class="user-poster" src="https://img.yzcdn.cn/public_files/2017/10/23/8690bb321356070e0b8c4404d087f8fd.png">
+    <van-cell is-link to="user/edit" class="user-info">
+      <!--left-->
+      <template slot="title">
+        <h1>{{username}}</h1>
+        <h5>上次登陆：{{lastLogin}}</h5>
+        <h5 v-if="bio">{{bio}}</h5>
+        <h5 v-else>你的简介空空如也，快来补充吧</h5>
+      </template>
+      <!--right-->
+      <template slot="right-icon">
+        <van-image
+          round
+          src="https://img.yzcdn.cn/vant/cat.jpeg"
+          class="user-img"
+        />
+        <van-icon name="arrow" class="user-icon"/>
+      </template>
+    </van-cell>
     <van-row class="user-links">
       <van-col v-for="item in links" :key="item.name" @click="goToOrder(item.name)" span="6">
         <van-icon :name="item.icon"/>
@@ -26,6 +43,7 @@
 
 <script>
 import mixins from '@/mixins'
+import { Info } from '@/api/user'
 
 export default {
   name: 'User',
@@ -52,7 +70,11 @@ export default {
           icon: 'logistics',
           name: '已完成'
         }
-      ]
+      ],
+      avatar: null,
+      username: null,
+      lastLogin: null,
+      bio: null
     }
   },
   methods: {
@@ -69,12 +91,36 @@ export default {
     if (!this.$store.state.is_login) {
       this.$router.push('account')
     }
+    Info({
+      uid: this.uid
+    }).then(res => {
+      this.username = res.username
+      this.avatar = res.avatar
+      this.lastLogin = res.lastLogin
+      this.bio = res.bio
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>
 
 <style lang="less">
   .user {
+    &-img {
+      position: absolute;
+      right: 10%;
+      top: 40px;
+      width: 100px;
+      height: 100px;
+    }
+
+    &-icon {
+      position: absolute;
+      top: 50%;
+      left: 90%;
+    }
+
     &-poster {
       width: 100%;
       height: 53vw;

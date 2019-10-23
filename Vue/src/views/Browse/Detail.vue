@@ -96,7 +96,20 @@ export default {
       this.$router.push({ name: 'cart' })
     },
     addToFavorite () {
-      Toast.success('收藏成功')
+      CollectCart({
+        goodsId: this.goodId,
+        uid: this.uid,
+        type: 0,
+        operate: 1
+      }).then(res => {
+        if (res.success) {
+          Toast.success(res.msg)
+        } else {
+          Toast.fail(res.msg)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     addToCart () {
       CollectCart({

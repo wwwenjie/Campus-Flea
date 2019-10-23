@@ -10,9 +10,22 @@ import json
 
 
 # Create your views here.
-def detail(request):
+def info(request):
     r = json.loads(request.body)
-    return JsonResponse({})
+    uid = r['uid']
+    u = User.objects.get(id=uid)
+    return JsonResponse({
+        'username': u.username,
+        'email': u.email,
+        'lastLogin': u.last_login,
+        'avatar': u.avatar,
+        'address': u.address,
+        'sex': u.sex,
+        'bday': u.bday,
+        'bio': u.bio,
+        'qq': u.qq,
+        'wechat': u.wechat
+    })
 
 
 def edit(request):

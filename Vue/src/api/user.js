@@ -31,3 +31,19 @@ export function Auth (data) {
     data: data
   })
 }
+
+export function Info (data) {
+  return request({
+    url: '/user/info',
+    method: 'post',
+    data: data
+  })
+}
+
+export function Edit (data) {
+  return request({
+    url: '/user/edit',
+    method: 'post',
+    data: data
+  })
+}

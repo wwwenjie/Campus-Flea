@@ -38,6 +38,11 @@ export default new Router({
       component: () => import('@/views/User/Edit.vue')
     },
     {
+      path: '/user/edit/userInfo',
+      name: 'editUserInfo',
+      component: () => import('@/views/User/EditUserInfo.vue')
+    },
+    {
       path: '/user/order',
       name: 'order',
       component: () => import('@/views/User/Order.vue')

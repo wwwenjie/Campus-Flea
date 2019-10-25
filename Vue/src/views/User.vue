@@ -12,7 +12,7 @@
       <template slot="right-icon">
         <van-image
           round
-          src="https://img.yzcdn.cn/vant/cat.jpeg"
+          :src="avatar"
           class="user-img"
         />
         <van-icon name="arrow" class="user-icon"/>
@@ -87,7 +87,7 @@ export default {
       this.$router.push({ name: 'order', params: { nav: nav } })
     }
   },
-  mounted () {
+  activated () {
     if (!this.$store.state.is_login) {
       this.$router.push('account')
     }
@@ -96,7 +96,7 @@ export default {
     }).then(res => {
       this.username = res.username
       this.avatar = res.avatar
-      this.lastLogin = res.lastLogin
+      this.lastLogin = new Date(res.lastLogin).toLocaleString()
       this.bio = res.bio
     }).catch(err => {
       console.log(err)
@@ -107,10 +107,15 @@ export default {
 
 <style lang="less">
   .user {
+    &-button{
+      margin: 2vh 5vw;
+      width: 90vw;
+    }
     &-img {
       position: absolute;
-      right: 10%;
-      top: 40px;
+      right: 10vw;
+      top: 50%;
+      transform: translate(0, -50%);
       width: 100px;
       height: 100px;
     }

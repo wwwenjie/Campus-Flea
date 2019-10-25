@@ -100,7 +100,7 @@ export default {
       this.checkedAll = this.checkedGoods.length === this.goods.length
     }
   },
-  mounted () {
+  activated () {
     if (this.$route.params.id) {
       this.nav = '创建订单'
       // get goods by goodId
@@ -128,7 +128,6 @@ export default {
         operate: null
       }).then(res => {
         if (res.success) {
-          console.log(res.data)
           this.goods = res.data
         } else {
           Toast.fail('购物车为空')
@@ -137,9 +136,6 @@ export default {
         console.log(err)
       })
     }
-  },
-  deactivated () {
-    this.$destroy()
   }
 }
 </script>

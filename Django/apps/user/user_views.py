@@ -30,3 +30,11 @@ def info(request):
 
 def edit(request):
     r = json.loads(request.body)
+    uid = r['uid']
+    content_type = r['type']
+    content = r['content']
+    try:
+        User.objects.filter(id=uid).update(**{content_type: content})
+        return JsonResponse({'success': True})
+    except RuntimeError:
+        return JsonResponse({'success': False})

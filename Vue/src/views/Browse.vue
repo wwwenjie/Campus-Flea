@@ -52,6 +52,10 @@
 <script>
 import mixins from '@/mixins'
 import { Browse, Search } from '@/api/goods'
+import { Lazyload } from 'vant'
+import Vue from 'vue'
+
+Vue.use(Lazyload)
 
 export default {
   name: 'Browse',

@@ -5,13 +5,8 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    { path: '/index', redirect: '/Multiply' },
-    { path: '/', redirect: '/Multiply' },
-    {
-      path: '/Multiply',
-      name: 'Multiply',
-      component: () => import('@/views/Multiply.vue')
-    },
+    { path: '/index', redirect: '/browse' },
+    { path: '/', redirect: '/browse' },
     {
       path: '/browse',
       name: 'browse',

@@ -30,12 +30,12 @@
     </van-cell-group>
 
     <van-cell-group class="user-group">
-      <van-cell icon="gold-coin-o" title="购物车" is-link to="cart"/>
+      <van-cell icon="cart-o" title="购物车" is-link to="cart"/>
       <van-cell icon="gift-o" title="我收藏的" is-link to="cart"/>
-      <van-cell icon="gift-o" title="我的账号" is-link to="user/edit"/>
+      <van-cell icon="contact" title="我的账号" is-link to="user/edit"/>
     </van-cell-group>
     <van-cell-group class="user-group">
-      <van-cell @click="logout" icon="gold-coin-o" title="退出登陆" is-link to="account"/>
+      <van-cell @click="logout" icon="close" title="退出登陆" is-link to="account"/>
     </van-cell-group>
     <tabs></tabs>
   </div>
